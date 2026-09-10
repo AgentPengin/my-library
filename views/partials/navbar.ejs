@@ -1,0 +1,43 @@
+<header class="leather-bar">
+  <div class="header-container">
+    <a href="/" class="brand-title">
+      📜 ALEXANDRIA ARCHIVE
+      <span class="badge">Sách & Phim</span>
+    </a>
+
+    <!-- Center Navigation -->
+    <div class="segmented-control">
+      <a href="/" class="segmented-tab <%= currentRoute === 'home' ? 'active' : '' %>">
+        🏛️ Sảnh Chính
+      </a>
+      <a href="/shelves" class="segmented-tab <%= currentRoute === 'shelves' ? 'active' : '' %>">
+        📚 Giá Sách Của Tôi
+      </a>
+      <a href="/search" class="segmented-tab <%= currentRoute === 'search' ? 'active' : '' %>">
+        🔍 Tra Cứu API
+      </a>
+    </div>
+
+    <!-- Right Controls / User Badge or Login & Register Buttons -->
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+        <!-- Logged In State -->
+        <a href="/shelves" class="btn-skeuo btn-brass" title="Hồ sơ độc giả">
+          <img src="<%= currentUser.avatar_url %>" alt="avatar" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; border: 1px solid #4a2810;">
+          <span><%= currentUser.username %></span>
+        </a>
+        <a href="/auth/logout" class="btn-skeuo btn-ruby" title="Đăng xuất" style="padding: 7px 11px; font-size: 12px;">
+          🚪 Thoát
+        </a>
+      <% } else { %>
+        <!-- Guest State: Show Both Login & Register Buttons -->
+        <a href="/login" class="btn-skeuo" style="font-size: 12px; padding: 7px 12px;">
+          🔑 Đăng Nhập
+        </a>
+        <a href="/register" class="btn-skeuo btn-brass" style="font-size: 12px; padding: 7px 14px;">
+          ✦ Đăng Ký Thẻ Mới
+        </a>
+      <% } %>
+    </div>
+  </div>
+</header>

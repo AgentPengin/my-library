@@ -1,0 +1,47 @@
+<!-- Modal Add to Shelf (Skeuomorphic Dialog) -->
+<div class="modal-overlay" id="shelfModal">
+  <div class="modal-box">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+      <div>
+        <div class="library-stamp" style="font-size: 9px; padding: 2px 6px; margin-bottom: 6px;">XẾP LÊN GIÁ SÁCH</div>
+        <h3 style="font-family: 'Cinzel', serif; font-size: 18px; color: #2c1608;">Thêm Tác Phẩm Vào Kệ</h3>
+      </div>
+      <button class="btn-skeuo js-close-modal" style="padding: 4px 10px; font-size: 12px;">✕ Đóng</button>
+    </div>
+
+    <form action="/shelves/add-item" method="POST">
+      <input type="hidden" name="media_id" id="modalMediaId" value="">
+
+      <div style="background: rgba(184, 142, 85, 0.15); border: 1px dashed #b88e55; padding: 10px 14px; border-radius: 4px; margin-bottom: 18px;">
+        <span style="font-size: 13px; color: #6e4e32;">Tác phẩm đang chọn:</span>
+        <div id="modalMediaTitle" style="font-size: 15px; font-weight: 700; color: #2c1608; margin-top: 2px;">
+          Tên sách / phim
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-size: 14px; font-weight: 600; color: #3d2312; margin-bottom: 6px;">
+          Chọn Kệ Muốn Lưu Trữ:
+        </label>
+        <select name="shelf_id" class="input-skeuo" style="cursor: pointer; padding: 8px 12px;">
+          <% if (typeof allShelves !== 'undefined' && allShelves) { %>
+            <% allShelves.forEach(shelf => { %>
+              <option value="<%= shelf.id %>">
+                <%= shelf.name %> (<%= shelf.shelf_wood === 'oak' ? 'Gỗ Sồi' : (shelf.shelf_wood === 'mahogany' ? 'Gỗ Gụ' : 'Gỗ Óc Chó') %>)
+              </option>
+            <% }) %>
+          <% } else { %>
+            <option value="shelf-1">Kệ 01: Sách Gối Đầu Giường & Thưởng Thức Mùa Thu</option>
+            <option value="shelf-2">Kệ 02: Điện Ảnh Kinh Điển & Vũ Trụ Bao La</option>
+            <option value="shelf-3">Kệ 03: Kho Tàng Khoa Học Viễn Tưởng</option>
+          <% } %>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-skeuo js-close-modal">Hủy Bỏ</button>
+        <button type="submit" class="btn-skeuo btn-brass">✦ Đặt Lên Kệ Gỗ</button>
+      </div>
+    </form>
+  </div>
+</div>

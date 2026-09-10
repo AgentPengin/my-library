@@ -1,0 +1,32 @@
+<div class="book-item" data-type="<%= item.media_type %>">
+  <a href="/items/<%= item.id %>" style="display: block;">
+    <% if (item.media_type === 'BOOK') { %>
+      <div class="silk-ribbon"></div>
+    <% } %>
+    
+    <div class="book-cover-wrapper">
+      <img src="<%= item.poster_url %>" alt="<%= item.title %>" loading="lazy">
+      <span class="media-tag <%= item.media_type === 'MOVIE' ? 'movie' : '' %>">
+        <%= item.media_type === 'BOOK' ? 'SÁCH' : 'PHIM' %>
+      </span>
+    </div>
+  </a>
+
+  <div class="book-meta">
+    <a href="/items/<%= item.id %>">
+      <div class="title" title="<%= item.title %>"><%= item.title %></div>
+    </a>
+    <div class="author" title="<%= item.creator %>"><%= item.creator %> (<%= item.release_year %>)</div>
+    
+    <!-- Quick Add to shelf button -->
+    <div style="margin-top: 6px;">
+      <button 
+        class="btn-skeuo btn-brass js-open-shelf-modal" 
+        style="font-size: 11px; padding: 3px 8px;"
+        data-media-id="<%= item.id %>"
+        data-media-title="<%= item.title %>">
+        + Kệ Sách
+      </button>
+    </div>
+  </div>
+</div>

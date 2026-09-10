@@ -1,0 +1,633 @@
+/* ==========================================================================
+   ALEXANDRIA ARCHIVE - CLASSIC SKEUOMORPHIC STYLESHEET (iOS 4 / iBooks STYLE)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap');
+
+/* --- Reset & Base Variables --- */
+:root {
+  --wood-oak-plank: linear-gradient(to bottom, #8a4b27 0%, #683619 40%, #46220e 80%, #321607 100%);
+  --wood-oak-border: #b56738;
+  
+  --wood-mahogany-plank: linear-gradient(to bottom, #722020 0%, #521515 40%, #380d0d 80%, #200606 100%);
+  --wood-mahogany-border: #993333;
+  
+  --wood-walnut-plank: linear-gradient(to bottom, #4a3424 0%, #382415 40%, #26160b 80%, #150a04 100%);
+  --wood-walnut-border: #6d503b;
+  
+  --brass-gradient: linear-gradient(135deg, #e6c278 0%, #c4953c 50%, #875e18 100%);
+  --parchment-bg: #fbf5e6 linear-gradient(to bottom, #fcf8ee 0%, #f3e8cb 100%);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'EB Garamond', Georgia, serif;
+  background: #170d07 radial-gradient(circle at 50% 15%, #321b0e 0%, #170c06 60%, #0c0603 100%);
+  color: #3b2818;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   TOP LEATHER HEADER & NAVIGATION (Scott Forstall / iOS 4 Aesthetic)
+   ========================================================================== */
+header.leather-bar {
+  background: #2b1d14 linear-gradient(to bottom, #442a1a 0%, #29180d 50%, #1c1008 100%);
+  border-bottom: 2px solid #5a3821;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.22);
+  padding: 12px 28px;
+  position: relative;
+  z-index: 100;
+}
+
+/* Top golden stitch line */
+header.leather-bar::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  border-bottom: 1px dashed rgba(212, 175, 55, 0.45);
+  pointer-events: none;
+}
+
+.header-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.brand-title {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #e6c587;
+  text-shadow: 0 -1px 0 #000, 0 1px 2px rgba(255, 220, 150, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-title span.badge {
+  font-family: 'EB Garamond', serif;
+  font-size: 13px;
+  font-weight: 600;
+  background: linear-gradient(to bottom, #8a1f1f, #4a0f0f);
+  color: #f7e6c4;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid #a32a2a;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 1px #000;
+}
+
+/* Segmented Control Tabs (iOS 4 style) */
+.segmented-control {
+  display: inline-flex;
+  background: #140b05;
+  border: 1px solid #4a2d1a;
+  border-radius: 6px;
+  padding: 3px;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.segmented-tab {
+  padding: 6px 16px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ad8d6f;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.segmented-tab:hover {
+  color: #ecd2b0;
+}
+
+.segmented-tab.active {
+  background: linear-gradient(to bottom, #7a5030 0%, #4f311c 100%);
+  color: #f7ebd7;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.3);
+  text-shadow: 0 -1px 1px #000;
+}
+
+/* Glossy Skeuomorphic Buttons */
+.btn-skeuo {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f5eedb;
+  padding: 7px 16px;
+  border-radius: 4px;
+  border: 1px solid #140b06;
+  background: linear-gradient(to bottom, #6d472a 0%, #462c19 50%, #331f11 51%, #4e321e 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 5px rgba(0,0,0,0.6);
+  text-shadow: 0 -1px 1px #000;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-skeuo:hover {
+  background: linear-gradient(to bottom, #7d5231 0%, #54351e 50%, #3e2615 51%, #5c3b24 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 3px 8px rgba(0,0,0,0.8);
+}
+
+.btn-skeuo:active {
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.85);
+  transform: translateY(1px);
+}
+
+.btn-brass {
+  background: linear-gradient(to bottom, #e2bc68 0%, #b88d37 50%, #9e7526 51%, #b38834 100%);
+  color: #2b1704;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+  border-color: #614612;
+}
+
+.btn-brass:hover {
+  background: linear-gradient(to bottom, #ebd082 0%, #c99f43 50%, #af842f 51%, #c5973e 100%);
+}
+
+.btn-ruby {
+  background: linear-gradient(to bottom, #9b2828 0%, #701616 50%, #520d0d 51%, #791a1a 100%);
+  border-color: #3b0707;
+}
+
+.btn-ruby:hover {
+  background: linear-gradient(to bottom, #b53333 0%, #831b1b 50%, #631111 51%, #8e2121 100%);
+}
+
+/* ==========================================================================
+   PAGE CONTAINER & BRASS PLATES
+   ========================================================================== */
+.main-wall {
+  flex: 1;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 30px 20px 70px;
+  width: 100%;
+}
+
+.brass-plate {
+  background: var(--brass-gradient);
+  padding: 6px 24px;
+  border-radius: 4px;
+  border: 2px solid #5a3c09;
+  box-shadow: 
+    inset 0 1px 0 rgba(255,255,255,0.65), 
+    inset 0 -1px 2px rgba(0,0,0,0.4),
+    0 5px 12px rgba(0,0,0,0.75);
+  position: relative;
+  display: inline-block;
+}
+
+/* Screws on Brass Plate */
+.brass-plate::before, .brass-plate::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  background: #482f04;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  box-shadow: inset 0 1px 1px #000, 0 1px 1px rgba(255,255,255,0.4);
+}
+.brass-plate::before { left: 8px; }
+.brass-plate::after { right: 8px; }
+
+.brass-plate h2, .brass-plate h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: #2b1704;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  text-shadow: 0 1px 0 rgba(255, 235, 170, 0.7);
+}
+
+.section-head-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   3D REALISTIC BOOKSHELF (iBooks System)
+   ========================================================================== */
+.bookshelf-unit {
+  background: linear-gradient(to right, #1f1109 0%, #301b0f 3%, #301b0f 97%, #1f1109 100%);
+  border: 8px solid #3d2314;
+  border-radius: 6px;
+  box-shadow: 
+    0 18px 40px rgba(0,0,0,0.95), 
+    inset 0 0 50px rgba(0,0,0,0.9);
+  padding: 10px 18px 0;
+  margin-bottom: 45px;
+  position: relative;
+}
+
+/* Wood variations */
+.bookshelf-unit.wood-mahogany {
+  background: linear-gradient(to right, #1a0808 0%, #2e1010 3%, #2e1010 97%, #1a0808 100%);
+  border-color: #401414;
+}
+.bookshelf-unit.wood-mahogany .wooden-plank {
+  background: var(--wood-mahogany-plank);
+  border-top-color: var(--wood-mahogany-border);
+}
+
+.bookshelf-unit.wood-walnut {
+  background: linear-gradient(to right, #120b06 0%, #1e140d 3%, #1e140d 97%, #120b06 100%);
+  border-color: #2c1c13;
+}
+.bookshelf-unit.wood-walnut .wooden-plank {
+  background: var(--wood-walnut-plank);
+  border-top-color: var(--wood-walnut-border);
+}
+
+.shelf-row {
+  position: relative;
+  padding: 30px 10px 0;
+}
+
+.shelf-back-shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.shelf-items-grid {
+  display: flex;
+  align-items: flex-end;
+  gap: 34px;
+  position: relative;
+  z-index: 2;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scroll-behavior: smooth;
+}
+
+.shelf-items-grid::-webkit-scrollbar {
+  height: 6px;
+}
+.shelf-items-grid::-webkit-scrollbar-thumb {
+  background: #50311a;
+  border-radius: 3px;
+}
+
+/* 3D Plank */
+.wooden-plank {
+  position: relative;
+  height: 28px;
+  margin: 0 -18px;
+  background: var(--wood-oak-plank);
+  border-top: 2px solid var(--wood-oak-border);
+  box-shadow: 
+    0 10px 20px rgba(0,0,0,0.95), 
+    inset 0 1px 1px rgba(255,255,255,0.4);
+  z-index: 5;
+}
+
+.wooden-plank::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: #220f04;
+}
+
+/* ==========================================================================
+   3D BOOK / MOVIE CARDS
+   ========================================================================== */
+.book-item {
+  position: relative;
+  width: 145px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.book-item:hover {
+  transform: translateY(-12px) scale(1.04);
+  z-index: 10;
+}
+
+.book-cover-wrapper {
+  position: relative;
+  width: 145px;
+  height: 210px;
+  border-radius: 2px 5px 5px 2px;
+  box-shadow: 
+    -5px 6px 14px rgba(0,0,0,0.65), 
+    4px 8px 20px rgba(0,0,0,0.85);
+  overflow: hidden;
+  background: #2a1b12;
+  border-left: 5px solid #140b06;
+}
+
+/* Spine Light Crease */
+.book-cover-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 100%;
+  background: linear-gradient(to right, 
+    rgba(255,255,255,0.25) 0%, 
+    rgba(0,0,0,0.3) 40%, 
+    rgba(255,255,255,0.15) 70%, 
+    transparent 100%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.book-cover-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(to left, rgba(0,0,0,0.4), transparent);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.book-cover-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Red Silk Ribbon Bookmark */
+.silk-ribbon {
+  position: absolute;
+  top: -7px;
+  right: 18px;
+  width: 18px;
+  height: 40px;
+  background: linear-gradient(to right, #8a1212, #c71f1f, #700c0c);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+  z-index: 4;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+}
+
+.media-tag {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(18, 11, 7, 0.9);
+  border: 1px solid #7c5836;
+  color: #e5cd9e;
+  font-size: 10px;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+  z-index: 4;
+  text-shadow: 0 1px 1px #000;
+}
+
+.media-tag.movie {
+  background: rgba(43, 10, 10, 0.92);
+  border-color: #922b2b;
+  color: #f7d0d0;
+}
+
+.book-meta {
+  margin-top: 10px;
+  text-align: center;
+  width: 145px;
+}
+
+.book-meta .title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e5cfac;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px #000;
+}
+
+.book-meta .author {
+  font-size: 12px;
+  color: #a48c71;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   VINTAGE PARCHMENT LIBRARY CARD (Reviews, Details, Forms)
+   ========================================================================== */
+.vintage-card {
+  background: var(--parchment-bg);
+  border: 1px solid #d8caa7;
+  border-radius: 5px;
+  padding: 28px;
+  box-shadow: 
+    0 12px 30px rgba(0,0,0,0.75),
+    inset 0 0 45px rgba(175, 142, 91, 0.16);
+  position: relative;
+  color: #3b2818;
+}
+
+/* Barber-pole top tape */
+.vintage-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(
+    45deg,
+    #a82c2c,
+    #a82c2c 10px,
+    #fbf5e6 10px,
+    #fbf5e6 20px
+  );
+  border-radius: 5px 5px 0 0;
+  opacity: 0.75;
+}
+
+.library-stamp {
+  border: 2px dashed #932424;
+  color: #932424;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  text-transform: uppercase;
+  transform: rotate(-5deg);
+  border-radius: 4px;
+  letter-spacing: 1px;
+  display: inline-block;
+}
+
+.star-rating {
+  color: #b8860b;
+  font-size: 17px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+  margin-bottom: 8px;
+}
+
+/* Search input vintage card catalog */
+.search-box-card {
+  background: linear-gradient(to bottom, #3d2618 0%, #29170d 100%);
+  border: 4px solid #50311d;
+  border-radius: 6px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.8);
+  margin-bottom: 35px;
+}
+
+.input-skeuo {
+  width: 100%;
+  background: #fbf5e6;
+  border: 2px solid #8e6542;
+  border-radius: 4px;
+  padding: 10px 16px;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 16px;
+  color: #2b180a;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+  outline: none;
+}
+
+.input-skeuo:focus {
+  border-color: #c99349;
+  background: #fffefb;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 8px rgba(201, 147, 73, 0.6);
+}
+
+/* Footer (Antique Wood) */
+footer.antique-footer {
+  background: #140b06 linear-gradient(to bottom, #211208 0%, #110803 100%);
+  border-top: 2px solid #482b18;
+  padding: 24px 20px;
+  text-align: center;
+  color: #8c7257;
+  font-size: 14px;
+  margin-top: auto;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.8);
+}
+
+footer.antique-footer a {
+  color: #d4b174;
+  text-decoration: underline;
+}
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.78);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--parchment-bg);
+  border: 4px solid #633c1f;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.95), inset 0 0 35px rgba(175, 142, 91, 0.2);
+  width: 100%;
+  max-width: 520px;
+  padding: 28px;
+  position: relative;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  header.leather-bar {
+    padding: 10px 16px;
+  }
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .brand-title {
+    justify-content: center;
+  }
+  .segmented-control {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   SKEUOMORPHIC ERROR ALERT (iOS 4 Shake + Wax Stamp)
+   ========================================================================== */
+.skeuo-error-alert {
+  background: #fcf1f1 linear-gradient(to bottom, #fdf5f5 0%, #fae6e6 100%);
+  border: 2px dashed #932424;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  text-align: center;
+  box-shadow: 
+    0 4px 12px rgba(147, 36, 36, 0.2), 
+    inset 0 0 15px rgba(147, 36, 36, 0.08);
+  animation: skeuoShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes skeuoShake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(4px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+  40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+

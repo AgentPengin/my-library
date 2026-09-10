@@ -1,0 +1,125 @@
+<%- include('../partials/header', { title: shelf.name + ' - Alexandria Archive' }) %>
+<%- include('../partials/navbar', { currentRoute: 'shelves' }) %>
+
+<main class="main-wall">
+  
+  <!-- BACK NAVIGATION -->
+  <div style="margin-bottom: 20px;">
+    <a href="/shelves" class="btn-skeuo" style="font-size: 12px; padding: 5px 12px;">
+      ◀ Quay lại Tất Cả Giá Sách
+    </a>
+  </div>
+
+  <!-- SHELF HEADER BRASS & INFO -->
+  <div class="vintage-card" style="margin-bottom: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+      <div>
+        <div class="library-stamp" style="font-size: 10px; margin-bottom: 6px;">
+          <%= shelf.is_public ? 'GIÁ SÁCH CÔNG KHAI' : 'GIÁ SÁCH RIÊNG TƯ' %>
+        </div>
+        <h1 style="font-family: 'Cinzel', serif; font-size: 26px; color: #2e1706; margin-bottom: 8px;">
+          <%= shelf.name %>
+        </h1>
+        <p style="font-size: 16px; color: #523824; font-style: italic; max-width: 750px; line-height: 1.6;">
+          <%= shelf.description || 'Chưa có lời tựa cho giá sách này.' %>
+        </p>
+        
+        <div style="margin-top: 14px; display: flex; gap: 16px; font-size: 13px; color: #7a5f45; border-top: 1px dashed #d6c6a4; padding-top: 10px;">
+          <span>Chất liệu: <strong><%= shelf.shelf_wood === 'oak' ? 'Gỗ Sồi Cổ (Oak)' : (shelf.shelf_wood === 'mahogany' ? 'Gỗ Gụ Hoàng Gia' : 'Gỗ Óc Chó') %></strong></span>
+          <span>Số lượng: <strong><%= shelf.items.length %> tác phẩm</strong></span>
+          <span>Khởi tạo: <strong><%= shelf.created_at %></strong></span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <a href="/search" class="btn-skeuo btn-brass">
+          + Tìm Sách/Phim Xếp Vào
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW MODE SWITCH -->
+  <div class="section-head-bar">
+    <div class="brass-plate">
+      <h2>Tác Phẩm Đang Trưng Bày Trên Kệ</h2>
+    </div>
+
+    <div class="segmented-control">
+      <button class="segmented-tab active" onclick="switchShelfView('3d', this)">
+        🪵 Chế Độ Kệ Gỗ 3D
+      </button>
+      <button class="segmented-tab" onclick="switchShelfView('table', this)">
+        📋 Phiếu Thư Mục (Bảng)
+      </button>
+    </div>
+  </div>
+
+  <!-- 3D WOODEN SHELF VIEW -->
+  <div id="view3D" class="bookshelf-unit wood-<%= shelf.shelf_wood %>">
+    <%- include('../partials/shelf-row', { items: shelf.items }) %>
+  </div>
+
+  <!-- VINTAGE TABLE CATALOG VIEW -->
+  <div id="viewTable" class="vintage-card" style="display: none; padding: 15px;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 15px;">
+      <thead>
+        <tr style="border-bottom: 2px solid #8e6843; color: #3b220d; font-family: 'Cinzel', serif;">
+          <th style="padding: 10px 8px;">Bìa</th>
+          <th style="padding: 10px 8px;">Tên Tác Phẩm</th>
+          <th style="padding: 10px 8px;">Tác Giả / Đạo Diễn</th>
+          <th style="padding: 10px 8px;">Loại</th>
+          <th style="padding: 10px 8px;">Năm</th>
+          <th style="padding: 10px 8px; text-align: right;">Hành Động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% shelf.items.forEach(item => { %>
+          <tr style="border-bottom: 1px dashed #d8caa7;">
+            <td style="padding: 8px;">
+              <img src="<%= item.poster_url %>" alt="" style="width: 40px; height: 55px; object-fit: cover; border-radius: 2px; border: 1px solid #6b4728;">
+            </td>
+            <td style="padding: 8px; font-weight: 700; color: #2e1706;">
+              <a href="/items/<%= item.id %>" style="text-decoration: underline;"><%= item.title %></a>
+            </td>
+            <td style="padding: 8px; color: #5a3d24;"><%= item.creator %></td>
+            <td style="padding: 8px;">
+              <span class="media-tag <%= item.media_type === 'MOVIE' ? 'movie' : '' %>" style="position: static; display: inline-block;">
+                <%= item.media_type === 'BOOK' ? 'SÁCH' : 'PHIM' %>
+              </span>
+            </td>
+            <td style="padding: 8px; color: #7a5f45;"><%= item.release_year %></td>
+            <td style="padding: 8px; text-align: right;">
+              <form action="/shelves/<%= shelf.id %>/remove-item" method="POST" style="display: inline;" onsubmit="return confirm('Bạn có chắc muốn gỡ tác phẩm này khỏi giá sách?');">
+                <input type="hidden" name="media_id" value="<%= item.id %>">
+                <button type="submit" class="btn-skeuo btn-ruby" style="font-size: 11px; padding: 3px 8px;">
+                  Gỡ Khỏi Kệ
+                </button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<script>
+  function switchShelfView(mode, btn) {
+    document.querySelectorAll('.segmented-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const v3d = document.getElementById('view3D');
+    const vTable = document.getElementById('viewTable');
+    if (mode === '3d') {
+      v3d.style.display = 'block';
+      vTable.style.display = 'none';
+    } else {
+      v3d.style.display = 'none';
+      vTable.style.display = 'block';
+    }
+  }
+</script>
+
+<%- include('../partials/footer') %>

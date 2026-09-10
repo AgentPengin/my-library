@@ -1,0 +1,84 @@
+<%- include('../partials/header', { title: 'Cấp Thẻ Độc Giả Mới - Alexandria Archive' }) %>
+  <%- include('../partials/navbar', { currentRoute: 'register' }) %>
+
+    <main class="main-wall" style="max-width: 620px; margin-top: 30px;">
+
+      <div class="vintage-card" style="border: 4px solid #5a381e; box-shadow: 0 20px 45px rgba(0,0,0,0.9);">
+
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div class="library-stamp" style="font-size: 11px; margin-bottom: 8px;">ĐƠN ĐĂNG KÝ THẺ ĐỘC GIẢ</div>
+          <h1 style="font-family: 'Cinzel', serif; font-size: 24px; color: #2e1706; letter-spacing: 1px;">
+            Gia Nhập Alexandria Archive
+          </h1>
+          <p style="font-size: 14px; color: #6b4d32; font-style: italic; margin-top: 4px;">
+            Tạo hồ sơ và bắt đầu sở hữu những giá sách gỗ của riêng bạn
+          </p>
+        </div>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+          <div class="skeuo-error-alert">
+            <div style="font-size: 14px; font-weight: 700; color: #8a1d1d; text-shadow: 0 1px 0 rgba(255,255,255,0.6);">
+              ⚠️ <%= error %>
+            </div>
+          </div>
+        <% } %>
+
+        <form action="/auth/register" method="POST">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+              <label style="display: block; font-size: 14px; font-weight: 700; color: #3b220d; margin-bottom: 6px;">
+                Tên Độc Giả (Username):
+              </label>
+              <input type="text" name="username" class="input-skeuo" placeholder="vd: vintage_scholar" required>
+            </div>
+            <div>
+              <label style="display: block; font-size: 14px; font-weight: 700; color: #3b220d; margin-bottom: 6px;">
+                Địa Chỉ Thư Điện Tử (Email):
+              </label>
+              <input type="email" name="email" class="input-skeuo" placeholder="reader@archive.org" required>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 14px; font-weight: 700; color: #3b220d; margin-bottom: 6px;">
+              Mật Khẩu Khởi Tạo:
+            </label>
+            <input type="password" name="password" class="input-skeuo" placeholder="Tối thiểu 6 ký tự bảo mật..."
+              required>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 14px; font-weight: 700; color: #3b220d; margin-bottom: 6px;">
+              Ảnh Chân Dung (Avatar URL):
+            </label>
+            <input type="url" name="avatar_url" class="input-skeuo" placeholder="https://..."
+              value="https://i.pinimg.com/736x/6c/0a/05/6c0a05a88d4dc79a696fc9a3c6aaba30.jpg">
+          </div>
+
+          <div style="margin-bottom: 22px;">
+            <label style="display: block; font-size: 14px; font-weight: 700; color: #3b220d; margin-bottom: 6px;">
+              Đôi Dòng Giới Thiệu (Bio):
+            </label>
+            <textarea name="bio" class="input-skeuo" rows="2"
+              placeholder="Sở thích đọc sách, gu phim ảnh ưa thích của bạn..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-skeuo btn-brass"
+            style="width: 100%; justify-content: center; padding: 12px; font-size: 15px;">
+            ✦ Đóng Dấu & Cấp Thẻ Độc Giả
+          </button>
+        </form>
+
+        <div
+          style="margin-top: 24px; border-top: 1px dashed #d1c09e; padding-top: 16px; text-align: center; font-size: 14px; color: #6b4d32;">
+          Đã có thẻ thư viện?
+          <a href="/login" style="font-weight: 700; color: #2e1706; text-decoration: underline;">
+            Đăng nhập tại đây
+          </a>
+        </div>
+
+      </div>
+
+    </main>
+
+    <%- include('../partials/footer') %>

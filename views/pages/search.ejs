@@ -1,0 +1,86 @@
+<%- include('../partials/header', { title: 'Tra Cứu Mục Lục Thư Viện - Alexandria Archive' }) %>
+<%- include('../partials/navbar', { currentRoute: 'search' }) %>
+
+<main class="main-wall">
+
+  <!-- SEARCH DRAWER / CARD CATALOG HEADER -->
+  <div class="search-box-card">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+      <div class="brass-plate">
+        <h1>🔍 Tra Cứu Mục Lục Thư Viện (Google Books & TMDB)</h1>
+      </div>
+      <div style="font-size: 13px; color: #d4b58e; font-style: italic;">
+        Mô phỏng hộc kéo thẻ thư mục Card Catalog thế kỷ 20
+      </div>
+    </div>
+
+    <!-- Search Form -->
+    <form action="/search" method="GET">
+      <div style="display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap;">
+        <input 
+          type="text" 
+          name="q" 
+          class="input-skeuo" 
+          value="<%= query || '' %>"
+          placeholder="Nhập tên sách, tác giả (Google Books) hoặc tên phim, đạo diễn (TMDB)..."
+          style="flex: 1; min-width: 250px;"
+        >
+
+        <select name="type" class="input-skeuo" style="width: 170px; cursor: pointer;">
+          <option value="ALL" <%= selectedType === 'ALL' ? 'selected' : '' %>>Toàn Bộ (All)</option>
+          <option value="BOOK" <%= selectedType === 'BOOK' ? 'selected' : '' %>>📚 Sách (Google Books)</option>
+          <option value="MOVIE" <%= selectedType === 'MOVIE' ? 'selected' : '' %>>🎬 Phim (TMDB)</option>
+        </select>
+
+        <button type="submit" class="btn-skeuo btn-brass" style="padding: 10px 22px; font-size: 14px;">
+          ✦ Tìm Kiếm
+        </button>
+      </div>
+    </form>
+
+    <!-- Developer Hint Alert -->
+    <div style="background: rgba(226, 188, 104, 0.12); border: 1px dashed #c99349; border-radius: 4px; padding: 10px 14px; font-size: 13px; color: #e8d0ae; line-height: 1.5;">
+      💡 <strong>Gợi ý cho Backend Developer:</strong> Khi bạn code Backend, route <code>/search</code> này sẽ gọi song song hai API: <code>fetch('https://www.googleapis.com/books/v1/volumes?q=...')</code> và <code>fetch('https://api.themoviedb.org/3/search/movie?...')</code>, sau đó chuẩn hóa thành danh sách để render ra EJS!
+    </div>
+  </div>
+
+  <!-- SEARCH RESULTS -->
+  <div class="section-head-bar">
+    <div class="brass-plate">
+      <h2>
+        Kết Quả Tìm Kiếm: 
+        <span style="font-size: 14px; font-weight: 400; opacity: 0.9;">
+          <%= results.length %> tác phẩm được tìm thấy <%= query ? `cho từ khóa "${query}"` : '' %>
+        </span>
+      </h2>
+    </div>
+  </div>
+
+  <% if (results && results.length > 0) { %>
+    <!-- Grid of results -->
+    <div class="bookshelf-unit wood-oak" style="padding-bottom: 25px;">
+      <div class="shelf-row">
+        <div class="shelf-back-shadow"></div>
+        <div class="shelf-items-grid" style="flex-wrap: wrap; gap: 30px; justify-content: flex-start;">
+          <% results.forEach(item => { %>
+            <%- include('../partials/book-card', { item: item }) %>
+          <% }) %>
+        </div>
+        <div class="wooden-plank" style="margin-top: 25px;"></div>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="vintage-card" style="text-align: center; padding: 50px 20px;">
+      <div class="library-stamp" style="margin-bottom: 12px;">KHÔNG CÓ DỮ LIỆU</div>
+      <h3 style="font-family: 'Cinzel', serif; font-size: 20px; color: #2e1706; margin-bottom: 8px;">
+        Không Tìm Thấy Thẻ Thư Mục Phù Hợp
+      </h3>
+      <p style="font-size: 15px; color: #6e4e32;">
+        Hãy thử tìm với các từ khóa mẫu như: <em>"Gatsby"</em>, <em>"Nolan"</em>, <em>"1984"</em>, <em>"Dune"</em> hoặc chọn loại mục <em>"Sách"</em> / <em>"Phim"</em>.
+      </p>
+    </div>
+  <% } %>
+
+</main>
+
+<%- include('../partials/footer') %>

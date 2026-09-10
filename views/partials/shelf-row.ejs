@@ -1,0 +1,18 @@
+<div class="shelf-row">
+  <div class="shelf-back-shadow"></div>
+  
+  <div class="shelf-items-grid">
+    <% if (items && items.length > 0) { %>
+      <% items.forEach(item => { %>
+        <%- include('./book-card', { item: item }) %>
+      <% }) %>
+    <% } else { %>
+      <div style="padding: 40px 20px; color: #a48c71; font-style: italic; font-size: 15px;">
+        Kệ này hiện đang trống. Hãy tìm kiếm sách hoặc phim để xếp lên kệ!
+      </div>
+    <% } %>
+  </div>
+
+  <!-- The 3D Wooden Plank -->
+  <div class="wooden-plank"></div>
+</div>
