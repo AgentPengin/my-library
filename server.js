@@ -147,8 +147,8 @@ async function getOpenLibraryRating(author, title) {
         'User-Agent': 'MyLibraryApp/1.0'
       }
     });
-    console.log(`LINK FOR ${title}: https://openlibrary.org${workKey}/ratings.json`);
-    ///works/OL45040569W
+    // console.log(`LINK FOR ${title}: https://openlibrary.org${workKey}/ratings.json`);
+
     if (!workResponse.ok) {
       return {rating: 0, count: 0};
     }
@@ -164,7 +164,7 @@ async function getOpenLibraryRating(author, title) {
   }
 }
 
-async function updateDataListsWeek() {
+async function updateBooksListsWeek() {
   try {
     // Fetch data từ API NYT
     const nyt_api_key = process.env.NYT_BOOKS_API;
@@ -173,13 +173,13 @@ async function updateDataListsWeek() {
     if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
     const data = await res.json();
     let itemsList = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 10; i++) {
       itemsList.push({
         author: data.results.books[i].author,
         title: data.results.books[i].title,
       });
     }
-    
+    let booksData = [];
     for (const item of itemsList) {
       const author = item.author;
       const title = item.title;
@@ -194,32 +194,105 @@ async function updateDataListsWeek() {
         media_type: "BOOK",
         title: book_data.volumeInfo.title || title,
         creator: book_data.volumeInfo.authors || author,
-        release_year: book_data.volumeInfo.publishedDate.slice(0, 4),
+        release_year: book_data.volumeInfo.publishedDate.slice(0, 4) || '2024',
           poster_url: book_data.volumeInfo.imageLinks?.thumbnail || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4Ykql_OXy7qrC4I1_luoiAAPBYozVJFJvp6xJbUB3pbIxqwrbnUm82g&s=10',
             overview: book_data.volumeInfo.description || "Chưa có tóm tắt cho cuốn sách này",
               genres: parseGenres(book_data.volumeInfo.categories) ?? "Văn học",
         average_rating: rating_data?.rating,
         total_reviews: rating_data?.count
       }  
-      console.log(book);
+      booksData.push(book);
     };
-    
-    } catch (err) {
-      console.error("Lỗi khi fetch data: ", err.message);
-      console.error("Lỗi thật sự: ", err.cause);
-    }
+    return booksData;
+  } catch (err) {
+    console.error("Lỗi khi fetch data: ", err.message);
+    console.error("Lỗi thật sự: ", err.cause);
+  }
 }
 
 async function getBooksListsOfWeek() {
   // dùng query lấy ra ngày cuối cùng cập nhật dữ liệu vào databases
   // nếu hơn 1 ngày trôi qua -> update data mới
-  const result = await db.query("SELECT data, updated_at FROM api_cache WHERE key = 'nyt_books_week'");
-  if (!result.rows[0]) {
-    await updateDataListsWeek();
+  const cacheKey = 'nyt_books_week';
+  const cachedRes = await db.query("SELECT data, updated_at FROM api_cache WHERE key = 'nyt_books_week'");
+  const cachedRow = cachedRes.rows[0];
+  if (cachedRow) {
+    const lastUpdated = new Date(cachedRow.updated_at).getTime();
+    const now = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000;
+    if (now - lastUpdated < oneDay) {
+      console.log("Dữ liệu sách trong tuần của NYT đã được cache, không cần fetch lại.");
+      const data = typeof cachedRow.data === 'string' ? JSON.parse(cachedRow.data) : cachedRow.data;
+      return data;
+    }
   }
 
+  const booksData = await updateBooksListsWeek();
+  const insertQuery = `
+    INSERT INTO api_cache (key, data, updated_at)
+    VALUES ($1, $2, NOW())
+    ON CONFLICT (KEY) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();
+  `;
+  let freshData = JSON.stringify(booksData);
+  await db.query(insertQuery, [cacheKey, freshData]);
+  return booksData;
+}
 
+async function updateFilmsListsWeek() {
+  try {
+    // Fetch data từ API NYT
+    const tmdb_api_key = process.env.TMDB_API_KEY;
+    const res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${tmdb_api_key}`);
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+    const data = await res.json();
+    let filmList = [];
+    for (const item of data.results.slice(0, 8)) {
+      const creditRes = await fetch(`https://api.themoviedb.org/3/movie/${item.id}/credits?api_key=${tmdb_api_key}`);
+      const creditData = await creditRes.json();
+      const director = creditData.crew.find(member => member.job === "Director");
+      const film = {
+        id: item.id,
+        media_type: "MOVIE",
+        title: item.title || item.original_title,
+        creator: director?.name || "Đạo diễn đang cập nhật",
+        release_year: item.release_date ? item.release_date.slice(0, 4) : '2024',
+        poster_url: `https://image.tmdb.org/t/p/w500${item.poster_path}` || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4Ykql_OXy7qrC4I1_luoiAAPBYozVJFJvp6xJbUB3pbIxqwrbnUm82g&s=10',
+        overview: item.overview || "Chưa có tóm tắt cho bộ phim này",
+        average_rating: item.vote_average || 0,
+        total_reviews: item.vote_count || 0
+      }  
+      filmList.push(film);
+    };
+    return filmList;
+  } catch (err) {
+    console.error("Lỗi khi fetch data: ", err.message);
+    console.error("Lỗi thật sự: ", err.cause);
+  }
+}
 
+async function getFilmsListsOfDay() {
+  const cacheKey = 'tmdb_films_day';
+  const cachedRes = await db.query("SELECT data, updated_at FROM api_cache WHERE key = 'tmdb_films_day'");
+  const cachedRow = cachedRes.rows[0];
+  if (cachedRow) {
+    const lastUpdated = new Date(cachedRow.updated_at).getTime();
+    const now = Date.now();
+    const oneHour = 60 * 60 * 1000;
+    if (now - lastUpdated < oneHour) {
+      console.log("Dữ liệu phim hot của TMDB đã được cache, không cần fetch lại.");
+      const data = typeof cachedRow.data === 'string' ? JSON.parse(cachedRow.data) : cachedRow.data;
+      return data;
+    }
+  }
+  const filmData = await updateFilmsListsWeek();
+  const insertQuery = `
+    INSERT INTO api_cache (key, data, updated_at)
+    VALUES ($1, $2, NOW())
+    ON CONFLICT (KEY) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();
+  `;
+  let freshData = JSON.stringify(filmData);
+  await db.query(insertQuery, [cacheKey, freshData]);
+  return filmData;
 }
 
 /* ==========================================================================
@@ -229,11 +302,8 @@ async function getBooksListsOfWeek() {
 // 1. TRANG CHỦ (SẢNH THƯ VIỆN)
 app.get('/', async (req, res) => {
   // Lọc riêng sách và phim (sau này featuredBooks sẽ lấy từ hàm getBooksListsOfWeek NYT của em)
-  const featuredBooks = mockData.mediaItems.filter(item => item.media_type === 'BOOK');
-  const featuredMovies = mockData.mediaItems.filter(item => item.media_type === 'MOVIE');
-
-  let take = await getBooksListsOfWeek();
-
+  const featuredBooks = await getBooksListsOfWeek();
+  const featuredMovies = await getFilmsListsOfDay();
   res.render('pages/index', {
     featuredBooks,
     featuredMovies,
