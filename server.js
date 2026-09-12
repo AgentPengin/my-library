@@ -117,38 +117,97 @@ function parseGenres(categories) {
   return [...new Set(genres)];
 }
 
+async function getOpenLibraryRating(author, title) {
+  try {
+    const params = new URLSearchParams({
+      author,
+      title,
+      limit: 1
+    });
+    const url = `https://openlibrary.org/search.json?${params}`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'MyLibraryApp/1.0'
+      }
+    });
+
+
+    if (!response.ok) {
+      return {
+        rating: 0,
+        count: 0
+      };
+    }
+    const data = await response.json();
+
+    if (!data.docs || data.docs.length === 0) return {rating: 0, count: 0};
+    const workKey = data.docs[0].key;
+    const workResponse = await fetch(`https://openlibrary.org${workKey}/ratings.json`, {
+      headers: {
+        'User-Agent': 'MyLibraryApp/1.0'
+      }
+    });
+    console.log(`LINK FOR ${title}: https://openlibrary.org${workKey}/ratings.json`);
+    ///works/OL45040569W
+    if (!workResponse.ok) {
+      return {rating: 0, count: 0};
+    }
+    const workData = await workResponse.json();
+    return {rating: workData.summary?.average ? parseFloat(workData.summary.average.toFixed(2)): 0, 
+            count: workData.summary?.count ?? 0};
+  } catch (error) {
+    console.warn(`Không lấy được rating cho cuốn sách: ${title}`);
+    return {
+      rating: 0, 
+      count: 0
+    }
+  }
+}
+
 async function updateDataListsWeek() {
   try {
     // Fetch data từ API NYT
     const nyt_api_key = process.env.NYT_BOOKS_API;
     const google_books_api_key = process.env.GOOGLE_BOOKS_API;
     const res = await fetch(`https://api.nytimes.com/svc/books/v3/lists/current/hardcover-fiction.json?api-key=${nyt_api_key}`);
-    if (!res.ok) throw new error(`HTTP error: ${res.status}`);
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
     const data = await res.json();
-    let isbnsList = [];
+    let itemsList = [];
     for (let i = 0; i < 6; i++) {
-      isbnsList.push(parseInt(data.results.books[i].isbns[0].isbn13));
+      itemsList.push({
+        author: data.results.books[i].author,
+        title: data.results.books[i].title,
+      });
     }
-    isbnsList.forEach(async (isbn) => {
-      const google_res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${google_books_api_key}`)
+    
+    for (const item of itemsList) {
+      const author = item.author;
+      const title = item.title;
+      const google_res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${title}+inauthor:${author}&key=${google_books_api_key}`);
       const google_data = await google_res.json();
       const book_data = google_data.items?.[0] ?? null;
-      const {
+      const isbn = book_data.volumeInfo.industryIdentifiers?.find(id => id.type === "ISBN_13")?.identifier;
+      const rating_data = await getOpenLibraryRating(author, title);
+
+      const book = {
         id: book_data.id,
         media_type: "BOOK",
-        title: book_data.volumeInfo.title,
-        creator: book_data.volumeInfo.authors,
+        title: book_data.volumeInfo.title || title,
+        creator: book_data.volumeInfo.authors || author,
         release_year: book_data.volumeInfo.publishedDate.slice(0, 4),
-          poster_url: book_data.volumeInfo.imageLinks.thumbnail,
-            overview: book_data.volumeInfo.description,
+          poster_url: book_data.volumeInfo.imageLinks?.thumbnail || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4Ykql_OXy7qrC4I1_luoiAAPBYozVJFJvp6xJbUB3pbIxqwrbnUm82g&s=10',
+            overview: book_data.volumeInfo.description || "Chưa có tóm tắt cho cuốn sách này",
               genres: parseGenres(book_data.volumeInfo.categories) ?? "Văn học",
-        // average_rating: 4.8,
+        average_rating: rating_data?.rating,
+        total_reviews: rating_data?.count
       }  
-    });
-
-} catch (err) {
-  console.error("Lỗi khi fetch data: ", err.message);
-}
+      console.log(book);
+    };
+    
+    } catch (err) {
+      console.error("Lỗi khi fetch data: ", err.message);
+      console.error("Lỗi thật sự: ", err.cause);
+    }
 }
 
 async function getBooksListsOfWeek() {
@@ -156,7 +215,7 @@ async function getBooksListsOfWeek() {
   // nếu hơn 1 ngày trôi qua -> update data mới
   const result = await db.query("SELECT data, updated_at FROM api_cache WHERE key = 'nyt_books_week'");
   if (!result.rows[0]) {
-
+    await updateDataListsWeek();
   }
 
 
