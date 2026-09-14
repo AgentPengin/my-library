@@ -18,15 +18,17 @@ CREATE TABLE users (
 );
 
 CREATE TABLE media_items (
-	id VARCHAR(100) PRIMARY KEY,
-	media_type VARCHAR(10) NOT NULL CHECK (media_type IN ('BOOK', 'MOVIE')),
-	title TEXT NOT NULL,
-	creator TEXT,
-	release_year VARCHAR(10),
-	poster_url TEXT,
-	overview TEXT,
-	genres TEXT[], 
-	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    id VARCHAR(100) PRIMARY KEY,
+    media_type VARCHAR(10) NOT NULL CHECK (media_type IN ('BOOK', 'MOVIE')),
+    title TEXT NOT NULL,
+    creator TEXT,
+    release_year VARCHAR(10),
+    poster_url TEXT,
+    overview TEXT,
+    genres TEXT[], 
+    average_rating NUMERIC(3, 2) DEFAULT 0,
+    total_reviews INT DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE shelves (

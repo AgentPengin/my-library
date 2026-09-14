@@ -59,7 +59,7 @@
             <%= item.average_rating || '4.8' %> / 5.0
           </span>
           <span style="font-size: 13px; color: #80674e; font-weight: 400;">
-            (<%= item.total_reviews || item.reviews.length %> đánh giá từ cộng đồng)
+            (<%= item.total_reviews || (item.reviews ? item.reviews.length : 0) %> đánh giá từ cộng đồng)
           </span>
         </div>
 
@@ -69,7 +69,7 @@
             Tóm Tắt Tác Phẩm
           </h4>
           <p style="font-size: 16px; line-height: 1.7; color: #3b2513;">
-            <%= item.overview %>
+            <%- item.overview %>
           </p>
         </div>
 
@@ -103,7 +103,7 @@
   <!-- REVIEWS SECTION -->
   <div class="section-head-bar">
     <div class="brass-plate">
-      <h2>✦ Đánh Giá & Cảm Nhận Từ Độc Giả (<%= item.reviews.length %>) ✦</h2>
+      <h2>✦ Đánh Giá & Cảm Nhận Từ Độc Giả (<%= (item.reviews && item.reviews.length) ? item.reviews.length : 0 %>) ✦</h2>
     </div>
   </div>
 

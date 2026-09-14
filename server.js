@@ -210,6 +210,122 @@ async function updateBooksListsWeek() {
   }
 }
 
+async function getBook(bookId) {
+  try {
+    const data = await db.query("SELECT * FROM media_items WHERE id = $1 AND media_type = 'BOOK'", [bookId]);
+    if (data.rows.length > 0) {
+      const book = data.rows[0];
+      // Lấy danh sách review đã có của cuốn sách này từ bảng reviews
+      const reviewData = await db.query(
+        "SELECT r.*, u.username, u.avatar_url FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.media_id = $1 ORDER BY r.created_at DESC", 
+        [bookId]
+      );
+      book.reviews = reviewData.rows || [];
+      return book;  
+    }
+
+    const google_books_api_key = process.env.GOOGLE_BOOKS_API;
+    const res = await fetch(`https://www.googleapis.com/books/v1/volumes/${bookId}?key=${google_books_api_key}`);
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+    const book_data = await res.json();
+    const isbn = book_data.volumeInfo.industryIdentifiers?.find(id => id.type === "ISBN_13")?.identifier;
+    const author = book_data.volumeInfo.authors;
+    const title = book_data.volumeInfo.title;
+
+    const rating_data = await getOpenLibraryRating(author, title);
+    
+    const book = {
+        id: book_data.id,
+        media_type: "BOOK",
+        title: title,
+        creator: Array.isArray(author) ? author.join(', ') : (author || "Tác giả đang cập nhật"),
+        release_year: book_data.volumeInfo.publishedDate?.slice(0, 4) || '2024',
+        poster_url: book_data.volumeInfo.imageLinks?.thumbnail || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4Ykql_OXy7qrC4I1_luoiAAPBYozVJFJvp6xJbUB3pbIxqwrbnUm82g&s=10',
+        overview: book_data.volumeInfo.description || "Chưa có tóm tắt cho cuốn sách này",
+        genres: parseGenres(book_data.volumeInfo.categories) ?? "Văn học",
+        average_rating: rating_data?.rating || 0,
+        total_reviews: rating_data?.count || 0,
+        reviews: [] // Sách mới lấy từ API về thì chưa có review nội bộ nào
+      }  
+    const insertQuery = `
+      INSERT INTO media_items (id, media_type, title, creator, release_year, poster_url, overview, genres, average_rating, total_reviews)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `;
+    await db.query(insertQuery, [
+      book.id,
+      book.media_type,
+      book.title,
+      book.creator,
+      book.release_year,
+      book.poster_url,
+      book.overview,
+      book.genres,
+      book.average_rating,
+      book.total_reviews
+    ]);
+    return book;
+  } catch (err) {
+    console.error("Lỗi khi lấy thông tin sách:", err);
+    return null;
+  }
+}
+
+async function getFilm(filmId) {
+  try {
+    const data = await db.query("SELECT * FROM media_items WHERE id = $1 AND media_type = 'MOVIE'", [filmId]);
+    if (data.rows.length > 0) {
+      const film = data.rows[0];
+      // Lấy danh sách review đã có của cuốn sách này từ bảng reviews
+      const reviewData = await db.query(
+        "SELECT r.*, u.username, u.avatar_url FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.media_id = $1 ORDER BY r.created_at DESC", 
+        [filmId]
+      );
+      film.reviews = reviewData.rows || [];
+      return film;  
+    }
+
+    const tmdb_api_key = process.env.TMDB_API_KEY;
+    const res = await fetch(`https://api.themoviedb.org/3/movie/${filmId}?api_key=${tmdb_api_key}`);
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+    const filmData = await res.json();
+    const creditRes = await fetch(`https://api.themoviedb.org/3/movie/${filmData.id}/credits?api_key=${tmdb_api_key}`);
+    const creditData = await creditRes.json();
+    const director = creditData.crew.find(member => member.job === "Director");
+    const film = {
+      id: filmData.id,
+      media_type: "MOVIE",
+      title: filmData.title || filmData.original_title,
+      creator: director?.name || "Đạo diễn đang cập nhật",
+      release_year: filmData.release_date ? filmData.release_date.slice(0, 4) : '2024',
+      poster_url: `https://image.tmdb.org/t/p/w500${filmData.poster_path}` || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4Ykql_OXy7qrC4I1_luoiAAPBYozVJFJvp6xJbUB3pbIxqwrbnUm82g&s=10',
+      overview: filmData.overview || "Chưa có tóm tắt cho bộ phim này",
+      average_rating: filmData.vote_average || 0,
+      total_reviews: filmData.vote_count || 0
+    }  
+    // console.log(film);
+    const insertQuery = `
+      INSERT INTO media_items (id, media_type, title, creator, release_year, poster_url, overview, genres, average_rating, total_reviews)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `;
+    await db.query(insertQuery, [
+      film.id,
+      film.media_type,
+      film.title,
+      film.creator,
+      film.release_year,
+      film.poster_url,
+      film.overview,
+      film.genres,
+      film.average_rating,
+      film.total_reviews
+    ]);
+    return film;
+  } catch (err) {
+    console.error("Lỗi khi lấy thông tin phim:", err);
+    return null;
+  }
+}
+
 async function getBooksListsOfWeek() {
   // dùng query lấy ra ngày cuối cùng cập nhật dữ liệu vào databases
   // nếu hơn 1 ngày trôi qua -> update data mới
@@ -371,13 +487,33 @@ app.post('/shelves/:id/remove-item', (req, res) => {
   res.redirect(`/shelves/${shelfId}`);
 });
 
-// 7. CHI TIẾT SÁCH HOẶC PHIM (VINTAGE CARD & REVIEWS)
-app.get('/items/:id', (req, res) => {
-  const item = mockData.getItemById(req.params.id);
+// 7A. TRANG CHI TIẾT SÁCH (GOOGLE BOOKS / DB) ✅
+app.get('/books/:id', async (req, res) => {
+  const bookId = req.params.id;
+  const item = await getBook(bookId);
   if (!item) {
-    return res.status(404).send('Không tìm thấy tác phẩm này.');
+    return res.status(404).send('Không tìm thấy cuốn sách này.');
   }
   res.render('pages/item-detail', { item });
+});
+
+// 7B. TRANG CHI TIẾT PHIM (TMDB / DB) ✅
+app.get('/movies/:id', async (req, res) => {
+  const movieId = req.params.id;
+  const item = await getFilm(movieId);
+  console.log(item);
+  if (!item) {
+    return res.status(404).send('Không tìm thấy bộ phim này.');
+  }
+  res.render('pages/item-detail', { item });
+});
+
+// 7C. (DỰ PHÒNG) CHUYỂN HƯỚNG NẾU CÓ AI VÀO LINK CŨ /items/:id
+app.get('/items/:id', (req, res) => {
+  const id = req.params.id;
+  if (id.startsWith('book_')) return res.redirect(`/books/${id}`);
+  if (id.startsWith('movie_')) return res.redirect(`/movies/${id}`);
+  res.redirect(`/books/${id}`);
 });
 
 // 8. ĐĂNG REVIEW MỚI
@@ -413,7 +549,7 @@ app.get('/search', (req, res) => {
   });
 });
 
-// 10. AUTH: ĐĂNG NHẬP & ĐĂNG KÝ
+// 10. AUTH: ✅
 app.get('/login', (req, res) => {
   res.render('pages/login', { currentRoute: 'login' });
 });

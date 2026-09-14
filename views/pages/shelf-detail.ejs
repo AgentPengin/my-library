@@ -80,7 +80,7 @@
               <img src="<%= item.poster_url %>" alt="" style="width: 40px; height: 55px; object-fit: cover; border-radius: 2px; border: 1px solid #6b4728;">
             </td>
             <td style="padding: 8px; font-weight: 700; color: #2e1706;">
-              <a href="/items/<%= item.id %>" style="text-decoration: underline;"><%= item.title %></a>
+              <a href="/<%= item.media_type === 'BOOK' ? 'books' : 'movies' %>/<%= item.id %>" style="text-decoration: underline;"><%= item.title %></a>
             </td>
             <td style="padding: 8px; color: #5a3d24;"><%= item.creator %></td>
             <td style="padding: 8px;">

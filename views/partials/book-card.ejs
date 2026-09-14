@@ -1,5 +1,5 @@
 <div class="book-item" data-type="<%= item.media_type %>">
-  <a href="/items/<%= item.id %>" style="display: block;">
+  <a href="/<%= item.media_type === 'BOOK' ? 'books' : 'movies' %>/<%= item.id %>" style="display: block;">
     <% if (item.media_type === 'BOOK') { %>
       <div class="silk-ribbon"></div>
     <% } %>
@@ -13,7 +13,7 @@
   </a>
 
   <div class="book-meta">
-    <a href="/items/<%= item.id %>">
+    <a href="/<%= item.media_type === 'BOOK' ? 'books' : 'movies' %>/<%= item.id %>">
       <div class="title" title="<%= item.title %>"><%= item.title %></div>
     </a>
     <div class="author" title="<%= item.creator %>"><%= item.creator %> (<%= item.release_year %>)</div>
