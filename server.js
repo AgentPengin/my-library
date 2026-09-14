@@ -428,27 +428,68 @@ app.get('/', async (req, res) => {
 });
 
 // 2. TẤT CẢ GIÁ SÁCH CỦA TÔI
-app.get('/shelves', (req, res) => {
-  res.render('pages/my-shelves', {
-    shelves: mockData.shelves
-  });
+app.get('/shelves', async (req, res) => {
+  try {
+    if (!req.isAuthenticated()) {
+      return res.redirect('/login');
+    }
+
+
+    let myShelves = [];
+    const queryShelves = await db.query("SELECT * FROM shelves WHERE user_id = $1", [req.user.id]);
+    const userShelves = queryShelves.rows || [];
+    for (const item of userShelves) {
+      const itemQuery = await db.query("SELECT m.* FROM shelf_items si JOIN media_items m ON si.media_id = m.id WHERE si.shelf_id = $1", [item.id]);
+      const itemRows = itemQuery.rows || [];
+
+
+      const shelfItems = itemRows.map(row => ({
+        id: row.id,
+        media_type: row.media_type,
+        title: row.title,
+        creator: row.creator,
+        release_year: row.release_year,
+        poster_url: row.poster_url,
+        overview: row.overview,
+        genres: row.genres,
+        average_rating: row.average_rating,
+        total_reviews: row.total_reviews
+      }));
+      const shelf = {
+        id: item.id,
+        user_id: item.user_id,
+        name: item.name,
+        description: item.description,
+        shelf_wood: item.shelf_wood,
+        is_public: item.is_public,
+        created_at: item.created_at,
+        items: shelfItems 
+      };
+      myShelves.push(shelf);
+    }
+    res.render('pages/my-shelves', {
+      shelves: myShelves
+    });
+  } catch (err) {
+    console.error("Lỗi khi lấy data giá sách của người dùng: ", err.message);
+    console.error("Lỗi thật sự: ", err.cause);
+  }
 });
 
 // 3. TẠO GIÁ SÁCH MỚI (MOCK POST)
-app.post('/shelves/create', (req, res) => {
+app.post('/shelves/create', async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect('/login');
+  }
+
   const { name, description, shelf_wood, is_public } = req.body;
-  const newShelf = {
-    id: `shelf-${Date.now()}`,
-    user_id: mockData.currentUser.id,
-    name: name || 'Giá Sách Mới',
-    description: description || '',
-    shelf_wood: shelf_wood || 'oak',
-    is_public: is_public === 'true',
-    created_at: new Date().toISOString().split('T')[0],
-    items: []
-  };
-  mockData.shelves.push(newShelf);
-  res.redirect('/shelves');
+  try {
+    await db.query("INSERT INTO shelves (user_id, name, description, shelf_wood, is_public) VALUES ($1, $2, $3, $4, $5)", [req.user.id, name, description, shelf_wood, is_public]);
+    res.redirect('/shelves');
+  } catch (err) {
+    console.error("Lỗi khi tạo giá sách mới: ", err.message);
+    console.error("Lỗi thật sự: ", err.cause);
+  }
 });
 
 // 4. CHI TIẾT 1 GIÁ SÁCH
@@ -501,19 +542,10 @@ app.get('/books/:id', async (req, res) => {
 app.get('/movies/:id', async (req, res) => {
   const movieId = req.params.id;
   const item = await getFilm(movieId);
-  console.log(item);
   if (!item) {
     return res.status(404).send('Không tìm thấy bộ phim này.');
   }
   res.render('pages/item-detail', { item });
-});
-
-// 7C. (DỰ PHÒNG) CHUYỂN HƯỚNG NẾU CÓ AI VÀO LINK CŨ /items/:id
-app.get('/items/:id', (req, res) => {
-  const id = req.params.id;
-  if (id.startsWith('book_')) return res.redirect(`/books/${id}`);
-  if (id.startsWith('movie_')) return res.redirect(`/movies/${id}`);
-  res.redirect(`/books/${id}`);
 });
 
 // 8. ĐĂNG REVIEW MỚI
