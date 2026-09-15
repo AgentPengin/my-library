@@ -94,9 +94,18 @@ const isAuthenticated = (req, res, next) => {
 }
 
 // Middleware gán dữ liệu toàn cục (user hiện tại, danh sách kệ) cho mọi view
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   res.locals.currentUser = req.user;
-  res.locals.allShelves = mockData.shelves;
+  if (req.user) {
+    try {
+      const shelfRes = await db.query("SELECT id, name, shelf_wood FROM shelves WHERE user_id = $1 ORDER BY created_at DESC", [req.user.id]);
+      res.locals.allShelves = shelfRes.rows || [];
+    } catch (e) {
+      res.locals.allShelves = [];
+    }
+  } else {
+    res.locals.allShelves = [];
+  }
   next();
 });
 
@@ -427,7 +436,7 @@ app.get('/', async (req, res) => {
   });
 });
 
-// 2. TẤT CẢ GIÁ SÁCH CỦA TÔI
+// 2. TẤT CẢ GIÁ SÁCH CỦA TÔI ✅
 app.get('/shelves', async (req, res) => {
   try {
     if (!req.isAuthenticated()) {
@@ -476,7 +485,7 @@ app.get('/shelves', async (req, res) => {
   }
 });
 
-// 3. TẠO GIÁ SÁCH MỚI (MOCK POST)
+// 3. TẠO GIÁ SÁCH MỚI (MOCK POST) ✅
 app.post('/shelves/create', async (req, res) => {
   if (!req.isAuthenticated()) {
     return res.redirect('/login');
@@ -493,39 +502,136 @@ app.post('/shelves/create', async (req, res) => {
 });
 
 // 4. CHI TIẾT 1 GIÁ SÁCH
-app.get('/shelves/:id', (req, res) => {
-  const shelf = mockData.getShelfById(req.params.id);
+app.get('/shelves/:id', async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect('/login');
+  }
+  const shelfId = req.params.id;
+  const itemQuery = await db.query("SELECT m.* FROM shelf_items si JOIN media_items m ON si.media_id = m.id WHERE si.shelf_id = $1", [shelfId]);
+  const itemRows = itemQuery.rows || [];
+  const shelfItems = itemRows.map(row => ({
+    id: row.id,
+    media_type: row.media_type,
+    title: row.title,
+    creator: row.creator,
+    release_year: row.release_year,
+    poster_url: row.poster_url,
+    overview: row.overview,
+    genres: row.genres,
+    average_rating: row.average_rating,
+    total_reviews: row.total_reviews
+  }));
+  const queryShelves = await db.query("SELECT * FROM shelves WHERE id = $1", [shelfId]);
+  const shelfRow = queryShelves.rows[0];
+  const shelf = {
+    id: shelfRow.id,
+    user_id: shelfRow.user_id,
+    name: shelfRow.name,
+    description: shelfRow.description,
+    shelf_wood: shelfRow.shelf_wood,
+    is_public: shelfRow.is_public,
+    created_at: shelfRow.created_at,
+    items: shelfItems 
+  };
+
+
   if (!shelf) {
     return res.status(404).send('Không tìm thấy giá sách này.');
   }
   res.render('pages/shelf-detail', { shelf });
 });
 
-// 5. THÊM TÁC PHẨM VÀO GIÁ SÁCH
-app.post('/shelves/add-item', (req, res) => {
-  const { shelf_id, media_id } = req.body;
-  const targetShelf = mockData.getShelfById(shelf_id);
-  const targetMedia = mockData.mediaItems.find(m => m.id === media_id);
-
-  if (targetShelf && targetMedia) {
-    const exists = targetShelf.items.some(i => i.id === media_id);
-    if (!exists) {
-      targetShelf.items.push(targetMedia);
+// 5. THÊM TÁC PHẨM VÀO GIÁ SÁCH (POSTGRESQL) ✅
+app.post('/shelves/add-item', async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect('/login');
+  }
+  const { shelf_id, media_id, media_type } = req.body;
+  if (!shelf_id || !media_id) {
+    return res.redirect('/shelves');
+  }
+  try {
+    // Đảm bảo tác phẩm đã có trong bảng media_items, nếu chưa có thì fetch và lưu
+    const checkMedia = await db.query("SELECT id FROM media_items WHERE id = $1", [media_id]);
+    if (checkMedia.rows.length === 0) {
+      if (media_type === 'MOVIE' || (!isNaN(media_id) && String(media_id).length <= 8)) {
+        await getFilm(media_id);
+      } else {
+        await getBook(media_id);
+      }
     }
+
+    // Chèn vào bảng shelf_items
+    await db.query(
+      "INSERT INTO shelf_items (shelf_id, media_id) VALUES ($1, $2) ON CONFLICT (shelf_id, media_id) DO NOTHING",
+      [shelf_id, media_id]
+    );
+    return res.redirect(`/shelves/${shelf_id}`);
+  } catch (err) {
+    console.error("Lỗi khi thêm tác phẩm vào giá sách:", err.message);
     return res.redirect(`/shelves/${shelf_id}`);
   }
-  res.redirect('/shelves');
 });
 
-// 6. GỠ TÁC PHẨM KHỎI GIÁ SÁCH
-app.post('/shelves/:id/remove-item', (req, res) => {
+// 6. GỠ TÁC PHẨM KHỎI GIÁ SÁCH (POSTGRESQL) ✅
+app.post('/shelves/:id/remove-item', async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect('/login');
+  }
   const shelfId = req.params.id;
   const { media_id } = req.body;
-  const shelf = mockData.getShelfById(shelfId);
-  if (shelf) {
-    shelf.items = shelf.items.filter(i => i.id !== media_id);
+  try {
+    await db.query(
+      "DELETE FROM shelf_items WHERE shelf_id = $1 AND media_id = $2",
+      [shelfId, media_id]
+    );
+    res.redirect(`/shelves/${shelfId}`);
+  } catch (err) {
+    console.error("Lỗi khi gỡ tác phẩm khỏi giá sách:", err.message);
+    res.redirect(`/shelves/${shelfId}`);
   }
-  res.redirect(`/shelves/${shelfId}`);
+});
+
+// 6B. XÓA TOÀN BỘ GIÁ SÁCH (POSTGRESQL) ✅
+app.post('/shelves/:id/delete', async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect('/login');
+  }
+  const shelfId = req.params.id;
+  try {
+    await db.query(
+      "DELETE FROM shelves WHERE id = $1 AND user_id = $2",
+      [shelfId, req.user.id]
+    );
+    res.redirect('/shelves');
+  } catch (err) {
+    console.error("Lỗi khi xóa giá sách:", err.message);
+    res.redirect(`/shelves/${shelfId}`);
+  }
+});
+
+// 6C. API TRA CỨU NHANH CHO MODAL
+app.get('/api/search-media', async (req, res) => {
+  const query = req.query.q || '';
+  const type = req.query.type || 'ALL';
+  try {
+    let sql = "SELECT * FROM media_items WHERE 1=1";
+    const params = [];
+    if (type && type !== 'ALL') {
+      params.push(type);
+      sql += ` AND media_type = $${params.length}`;
+    }
+    if (query) {
+      params.push(`%${query.toLowerCase()}%`);
+      sql += ` AND (LOWER(title) LIKE $${params.length} OR LOWER(creator) LIKE $${params.length})`;
+    }
+    sql += " LIMIT 10";
+    const result = await db.query(sql, params);
+    res.json(result.rows || []);
+  } catch (err) {
+    console.error("Lỗi API search-media:", err.message);
+    res.status(500).json([]);
+  }
 });
 
 // 7A. TRANG CHI TIẾT SÁCH (GOOGLE BOOKS / DB) ✅

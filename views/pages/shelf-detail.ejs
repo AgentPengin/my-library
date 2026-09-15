@@ -31,10 +31,18 @@
         </div>
       </div>
 
-      <div style="display: flex; gap: 10px;">
-        <a href="/search" class="btn-skeuo btn-brass">
-          + Tìm Sách/Phim Xếp Vào
-        </a>
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <!-- NÚT MỞ MODAL THÊM SÁCH/PHIM TRỰC TIẾP -->
+        <button type="button" class="btn-skeuo btn-brass" onclick="openAddMediaModal()">
+          ✦ Thêm Sách / Phim Vào Kệ
+        </button>
+
+        <!-- NÚT XÓA TOÀN BỘ GIÁ SÁCH NÀY -->
+        <form action="/shelves/<%= shelf.id %>/delete" method="POST" style="margin: 0; display: inline;" onsubmit="return confirm('⚠️ BẠN CÓ CHẮC CHẮN MUỐN XÓA GIÁ SÁCH NÀY?\n\nToàn bộ giá sách [<%= shelf.name %>] và các liên kết tác phẩm trên kệ sẽ bị dỡ bỏ. Hành động này không thể hoàn tác!');">
+          <button type="submit" class="btn-skeuo btn-ruby">
+            🗑️ Xóa Giá Sách Này
+          </button>
+        </form>
       </div>
     </div>
   </div>
@@ -105,6 +113,89 @@
 
 </main>
 
+<!-- MODAL: THÊM TÁC PHẨM VÀO KỆ HIỆN TẠI -->
+<div class="modal-overlay" id="addMediaToShelfModal">
+  <div class="modal-box" style="max-width: 620px; max-height: 88vh; overflow-y: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+      <div>
+        <div class="library-stamp" style="font-size: 9px; padding: 2px 6px; margin-bottom: 6px;">MỤC LỤC THƯ VIỆN</div>
+        <h3 style="font-family: 'Cinzel', serif; font-size: 19px; color: #2c1608;">✦ Xếp Tác Phẩm Vào Kệ: <%= shelf.name %> ✦</h3>
+      </div>
+      <button type="button" class="btn-skeuo" onclick="closeAddMediaModal()" style="padding: 4px 10px; font-size: 12px;">✕ Đóng</button>
+    </div>
+
+    <!-- TAB SWITCHER -->
+    <div class="segmented-control" style="margin-bottom: 16px;">
+      <button type="button" class="segmented-tab active" id="tabSearchBtn" onclick="switchAddTab('search')">
+        🔍 Tìm Kiếm Sách / Phim
+      </button>
+      <button type="button" class="segmented-tab" id="tabDirectBtn" onclick="switchAddTab('direct')">
+        🏷️ Nhập Mã ID Trực Tiếp
+      </button>
+    </div>
+
+    <!-- TAB 1: TÌM KIẾM TRỰC TIẾP -->
+    <div id="tabSearchSection">
+      <form onsubmit="handleLiveSearch(event)" style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+        <input 
+          type="text" 
+          id="shelfSearchQuery" 
+          class="input-skeuo" 
+          placeholder="Nhập tên sách, tác giả hoặc tên phim..." 
+          style="flex: 1; min-width: 200px; padding: 8px 12px;"
+          required
+        >
+        <select id="shelfSearchType" class="input-skeuo" style="width: 140px; padding: 8px; cursor: pointer;">
+          <option value="BOOK">📚 Sách (Google)</option>
+          <option value="MOVIE">🎬 Phim (DB)</option>
+        </select>
+        <button type="submit" class="btn-skeuo btn-brass" style="padding: 8px 16px; font-size: 13px;">
+          ✦ Tìm
+        </button>
+      </form>
+
+      <div id="searchResultsContainer" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+        <div style="text-align: center; color: #876d54; font-size: 14px; padding: 25px 15px; font-style: italic;">
+          Nhập từ khóa tác phẩm vào ô trên để tìm kiếm và xếp trực tiếp vào kệ gỗ này.
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: NHẬP MÃ ID TRỰC TIẾP -->
+    <div id="tabDirectSection" style="display: none;">
+      <form action="/shelves/add-item" method="POST">
+        <input type="hidden" name="shelf_id" value="<%= shelf.id %>">
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 13px; font-weight: 700; color: #3b220d; margin-bottom: 6px;">
+            Mã Lưu Trữ / Database ID / Google Books Volume ID:
+          </label>
+          <input 
+            type="text" 
+            name="media_id" 
+            class="input-skeuo" 
+            placeholder="Ví dụ: IFG7EQAAQBAJ (Google Books) hoặc mã phim..." 
+            required
+          >
+        </div>
+        <div style="margin-bottom: 18px;">
+          <label style="display: block; font-size: 13px; font-weight: 700; color: #3b220d; margin-bottom: 6px;">
+            Phân Loại:
+          </label>
+          <select name="media_type" class="input-skeuo" style="cursor: pointer;">
+            <option value="BOOK">📚 Sách (Google Books / CSDL)</option>
+            <option value="MOVIE">🎬 Phim (TMDB / CSDL)</option>
+          </select>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn-skeuo" onclick="closeAddMediaModal()">Hủy Bỏ</button>
+          <button type="submit" class="btn-skeuo btn-brass">✦ Xếp Vào Kệ Ngay</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+
 <script>
   function switchShelfView(mode, btn) {
     document.querySelectorAll('.segmented-tab').forEach(b => b.classList.remove('active'));
@@ -120,6 +211,113 @@
       vTable.style.display = 'block';
     }
   }
+
+  function openAddMediaModal() {
+    const modal = document.getElementById('addMediaToShelfModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  function closeAddMediaModal() {
+    const modal = document.getElementById('addMediaToShelfModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function switchAddTab(tab) {
+    const tabSearchBtn = document.getElementById('tabSearchBtn');
+    const tabDirectBtn = document.getElementById('tabDirectBtn');
+    const tabSearchSection = document.getElementById('tabSearchSection');
+    const tabDirectSection = document.getElementById('tabDirectSection');
+
+    if (tab === 'search') {
+      tabSearchBtn.classList.add('active');
+      tabDirectBtn.classList.remove('active');
+      tabSearchSection.style.display = 'block';
+      tabDirectSection.style.display = 'none';
+    } else {
+      tabDirectBtn.classList.add('active');
+      tabSearchBtn.classList.remove('active');
+      tabDirectSection.style.display = 'block';
+      tabSearchSection.style.display = 'none';
+    }
+  }
+
+  async function handleLiveSearch(event) {
+    event.preventDefault();
+    const query = document.getElementById('shelfSearchQuery').value.trim();
+    const type = document.getElementById('shelfSearchType').value;
+    const container = document.getElementById('searchResultsContainer');
+
+    if (!query) return;
+
+    container.innerHTML = '<div style="text-align: center; color: #876d54; padding: 25px; font-style: italic;">⏳ Đang tra cứu mục lục thư viện...</div>';
+
+    try {
+      let items = [];
+      if (type === 'BOOK') {
+        const res = await fetch('https://www.googleapis.com/books/v1/volumes?q=' + encodeURIComponent(query) + '&maxResults=8');
+        const data = await res.json();
+        if (data.items && data.items.length > 0) {
+          items = data.items.map(item => {
+            const vol = item.volumeInfo || {};
+            return {
+              id: item.id,
+              media_type: 'BOOK',
+              title: vol.title || 'Không rõ tiêu đề',
+              creator: vol.authors ? vol.authors.join(', ') : 'Không rõ tác giả',
+              release_year: vol.publishedDate ? vol.publishedDate.slice(0, 4) : '—',
+              poster_url: vol.imageLinks?.thumbnail || vol.imageLinks?.smallThumbnail || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4Ykql_OXy7qrC4I1_luoiAAPBYozVJFJvp6xJbUB3pbIxqwrbnUm82g&s=10'
+            };
+          });
+        }
+      } else {
+        const res = await fetch('/api/search-media?q=' + encodeURIComponent(query) + '&type=' + type);
+        items = await res.json();
+      }
+
+      if (!items || items.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #876d54; padding: 20px;">Không tìm thấy tác phẩm nào phù hợp với từ khóa.</div>';
+        return;
+      }
+
+      let html = '';
+      items.forEach(item => {
+        html += `
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(255,255,255,0.45); border: 1px solid #d4b896; border-radius: 4px; padding: 8px 12px;">
+            <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+              <img src="${item.poster_url || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4Ykql_OXy7qrC4I1_luoiAAPBYozVJFJvp6xJbUB3pbIxqwrbnUm82g&s=10'}" alt="" style="width: 36px; height: 50px; object-fit: cover; border-radius: 2px; border: 1px solid #7c5836; flex-shrink: 0;">
+              <div style="min-width: 0;">
+                <div style="font-weight: 700; color: #2e1706; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.title}</div>
+                <div style="font-size: 12px; color: #6a4b30; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.creator || ''} • ${item.release_year || ''}</div>
+              </div>
+            </div>
+            <form action="/shelves/add-item" method="POST" style="margin: 0; flex-shrink: 0;">
+              <input type="hidden" name="shelf_id" value="<%= shelf.id %>">
+              <input type="hidden" name="media_id" value="${item.id}">
+              <input type="hidden" name="media_type" value="${item.media_type}">
+              <button type="submit" class="btn-skeuo btn-brass" style="font-size: 12px; padding: 5px 12px; white-space: nowrap;">
+                ✦ Xếp Vào Kệ
+              </button>
+            </form>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = '<div style="text-align: center; color: #a12b2b; padding: 15px;">Có lỗi xảy ra khi tra cứu. Vui lòng thử lại hoặc dùng Tab nhập ID trực tiếp.</div>';
+    }
+  }
+
+  // Close modal when clicking backdrop
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('addMediaToShelfModal');
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeAddMediaModal();
+      });
+    }
+  });
 </script>
 
 <%- include('../partials/footer') %>
