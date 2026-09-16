@@ -1,18 +1,42 @@
-<div class="shelf-row">
-  <div class="shelf-back-shadow"></div>
-  
-  <div class="shelf-items-grid">
-    <% if (items && items.length > 0) { %>
-      <% items.forEach(item => { %>
-        <%- include('./book-card', { item: item }) %>
-      <% }) %>
-    <% } else { %>
+<%
+  // Chia các tác phẩm thành các tầng kệ gỗ (mỗi tầng 6 cuốn)
+  const chunkSize = (typeof itemsPerTier !== 'undefined' && itemsPerTier) ? itemsPerTier : 6;
+  const tiers = [];
+  if (items && items.length > 0) {
+    for (let i = 0; i < items.length; i += chunkSize) {
+      tiers.push(items.slice(i, i + chunkSize));
+    }
+  }
+%>
+
+<% if (tiers.length > 0) { %>
+  <% tiers.forEach((tierItems, tierIndex) => { %>
+    <div class="shelf-row" style="margin-bottom: 25px;">
+      <div class="shelf-back-shadow"></div>
+      
+      <div class="shelf-items-grid" style="flex-wrap: wrap; gap: 24px; justify-content: flex-start; min-height: 260px;">
+        <% tierItems.forEach(item => { %>
+          <%- include('./book-card', { 
+            item: item, 
+            currentShelfId: typeof currentShelfId !== 'undefined' ? currentShelfId : null,
+            currentShelfOwnerId: typeof currentShelfOwnerId !== 'undefined' ? currentShelfOwnerId : null,
+            isOwner: typeof isOwner !== 'undefined' ? isOwner : true
+          }) %>
+        <% }) %>
+      </div>
+
+      <!-- Thanh gỗ đỡ sách 3D cho từng tầng -->
+      <div class="wooden-plank"></div>
+    </div>
+  <% }) %>
+<% } else { %>
+  <div class="shelf-row">
+    <div class="shelf-back-shadow"></div>
+    <div class="shelf-items-grid">
       <div style="padding: 40px 20px; color: #a48c71; font-style: italic; font-size: 15px;">
         Kệ này hiện đang trống. Hãy tìm kiếm sách hoặc phim để xếp lên kệ!
       </div>
-    <% } %>
+    </div>
+    <div class="wooden-plank"></div>
   </div>
-
-  <!-- The 3D Wooden Plank -->
-  <div class="wooden-plank"></div>
-</div>
+<% } %>

@@ -3,14 +3,45 @@
 
 <main class="main-wall">
   
-  <div style="margin-bottom: 20px;">
-    <a href="javascript:history.back()" class="btn-skeuo" style="font-size: 12px; padding: 5px 12px;">
-      ◀ Quay Lại
-    </a>
+  <!-- BACK NAVIGATION -->
+  <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <% if (typeof fromShelf !== 'undefined' && fromShelf) { %>
+      <a href="/shelves/<%= fromShelf %>" class="btn-skeuo" style="font-size: 12px; padding: 5px 12px;">
+        ◀ Quay Lại Giá Sách Tuyển Chọn
+      </a>
+    <% } else { %>
+      <a href="javascript:history.back()" class="btn-skeuo" style="font-size: 12px; padding: 5px 12px;">
+        ◀ Quay Lại
+      </a>
+    <% } %>
   </div>
 
+  <!-- CURATOR'S SPOTLIGHT (NẾU ĐI TỪ LINK CHIA SẺ CỦA NGƯỜI TUYỂN CHỌN) -->
+  <% if (typeof curatorReview !== 'undefined' && curatorReview) { %>
+    <div class="vintage-card" style="margin-bottom: 30px; border: 2px solid #b8860b; background: linear-gradient(to bottom, #fffdf8 0%, #fbf5e8 100%); box-shadow: 0 6px 20px rgba(184, 134, 11, 0.2);">
+      <div class="library-stamp" style="float: right; background: #8e2b10; color: #fff;">LỜI BÌNH NGƯỜI TUYỂN CHỌN</div>
+      
+      <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 12px;">
+        <img src="<%= curatorReview.avatar_url %>" alt="" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #b8860b; object-fit: cover;">
+        <div>
+          <div style="font-size: 11px; color: #8a6538; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Góc nhìn tuyển chọn từ độc giả:</div>
+          <div style="font-family: 'Cinzel', serif; font-size: 18px; color: #2e1706; font-weight: 700;"><%= curatorReview.username %></div>
+        </div>
+      </div>
+
+      <div class="star-rating" style="font-size: 15px; margin-bottom: 8px;">
+        <% for(let i=0; i<Math.floor(curatorReview.rating); i++) { %>★<% } %>
+        <span style="font-size: 13px; color: #523820; font-weight: 700;">(<%= curatorReview.rating %> / 5.0)</span>
+      </div>
+
+      <p style="font-size: 16px; line-height: 1.7; color: #3b220d; font-style: italic; background: rgba(226, 188, 104, 0.15); padding: 12px 16px; border-left: 4px solid #b8860b; border-radius: 0 4px 4px 0;">
+        "<%= curatorReview.content %>"
+      </p>
+    </div>
+  <% } %>
+
   <!-- MAIN VINTAGE DOSSIER / LIBRARY CARD -->
-  <div class="vintage-card" style="margin-bottom: 40px;">
+  <div class="vintage-card" style="margin-bottom: 35px;">
     
     <div class="library-stamp" style="float: right;">
       HỒ SƠ <%= item.media_type === 'BOOK' ? 'GOOGLE BOOKS' : 'TMDB ARCHIVE' %>
@@ -44,7 +75,7 @@
         <!-- Genres Tags -->
         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
           <% if (item.genres && item.genres.length > 0) { %>
-            <% item.genres.forEach(genre => { %>
+            <% (Array.isArray(item.genres) ? item.genres : [item.genres]).forEach(genre => { %>
               <span style="background: rgba(138, 75, 39, 0.12); border: 1px solid #c49d71; padding: 2px 10px; border-radius: 3px; font-size: 12px; color: #4e3017;">
                 <%= genre %>
               </span>
@@ -59,7 +90,7 @@
             <%= item.average_rating || '4.8' %> / 5.0
           </span>
           <span style="font-size: 13px; color: #80674e; font-weight: 400;">
-            (<%= item.total_reviews || (item.reviews ? item.reviews.length : 0) %> đánh giá từ cộng đồng)
+            (<%= item.total_reviews || 0 %> đánh giá từ cộng đồng)
           </span>
         </div>
 
@@ -84,7 +115,7 @@
           </button>
 
           <a href="#writeReview" class="btn-skeuo" style="padding: 10px 20px; font-size: 14px;">
-            ✍️ Viết Đánh Giá Mới
+            ✍️ <%= (typeof myReview !== 'undefined' && myReview) ? 'Xem / Sửa Đánh Giá Của Bạn' : 'Viết Đánh Giá Mới' %>
           </a>
         </div>
 
@@ -100,10 +131,45 @@
 
   </div>
 
-  <!-- REVIEWS SECTION -->
+  <!-- NHẬT KÝ ĐỘC GIẢ CỦA BẠN (NẾU USER HIỆN TẠI ĐÃ TỪNG ĐÁNH GIÁ) -->
+  <% if (typeof myReview !== 'undefined' && myReview) { %>
+    <div class="vintage-card" style="margin-bottom: 35px; border-left: 6px solid #2e4a1f; background: linear-gradient(to bottom, #fcfefc 0%, #f4f8f3 100%);">
+      <div class="library-stamp" style="float: right; background: #2e4a1f; color: #fff;">NHẬT KÝ CỦA BẠN</div>
+      
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+        <div>
+          <h3 style="font-family: 'Cinzel', serif; font-size: 18px; color: #1a3310; margin-bottom: 4px;">
+            📜 Cảm Nhận & Điểm Số Cá Nhân Của Bạn
+          </h3>
+          <div style="font-size: 12px; color: #557049;">
+            Ghi nhận vào sổ thư viện: <strong><%= myReview.created_at ? new Date(myReview.created_at).toLocaleDateString('vi-VN') : 'Đã ghi' %></strong>
+          </div>
+        </div>
+
+        <a href="#writeReview" class="btn-skeuo btn-brass" style="font-size: 12px; padding: 5px 12px;">
+          ✏️ Chỉnh Sửa Bài Viết
+        </a>
+      </div>
+
+      <div class="star-rating" style="font-size: 16px; margin-bottom: 8px;">
+        <% for(let i=0; i<Math.floor(myReview.rating); i++) { %>★<% } %>
+        <span style="font-size: 14px; color: #2c441c; font-weight: 700;">(<%= myReview.rating %> / 5.0)</span>
+      </div>
+
+      <% if (myReview.contains_spoilers) { %>
+        <div style="color: #932424; font-size: 11px; font-weight: 700; margin-bottom: 6px;">⚠️ BẠN ĐÃ ĐÁNH DẤU BÀI VIẾT CÓ TIẾT LỘ NỘI DUNG (SPOILER)</div>
+      <% } %>
+
+      <p style="font-size: 16px; line-height: 1.7; color: #223318; white-space: pre-line; margin-top: 8px;">
+        <%= myReview.content %>
+      </p>
+    </div>
+  <% } %>
+
+  <!-- REVIEWS SECTION: ĐÁNH GIÁ TỪ CỘNG ĐỒNG -->
   <div class="section-head-bar">
     <div class="brass-plate">
-      <h2>✦ Đánh Giá & Cảm Nhận Từ Độc Giả (<%= (item.reviews && item.reviews.length) ? item.reviews.length : 0 %>) ✦</h2>
+      <h2>✦ Đánh Giá Từ Độc Giả Cộng Đồng (<%= (item.reviews && item.reviews.length) ? item.reviews.length : 0 %>) ✦</h2>
     </div>
   </div>
 
@@ -115,10 +181,10 @@
           <div class="library-stamp" style="float: right;">XÁC THỰC (VERIFIED)</div>
           
           <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 10px;">
-            <img src="<%= review.user.avatar_url %>" alt="" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid #7c5836; object-fit: cover;">
+            <img src="<%= review.avatar_url || 'https://i.pinimg.com/736x/6c/0a/05/6c0a05a88d4dc79a696fc9a3c6aaba30.jpg' %>" alt="" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid #7c5836; object-fit: cover;">
             <div>
-              <div style="font-weight: 700; color: #2e1706;"><%= review.user.username %></div>
-              <div style="font-size: 12px; color: #7f6750;"><%= review.created_at %></div>
+              <div style="font-weight: 700; color: #2e1706;"><%= review.username %></div>
+              <div style="font-size: 12px; color: #7f6750;"><%= review.created_at ? new Date(review.created_at).toLocaleDateString('vi-VN') : '' %></div>
             </div>
           </div>
 
@@ -138,45 +204,46 @@
       <% }) %>
     <% } else { %>
       <div class="vintage-card" style="text-align: center; color: #876d54; font-style: italic;">
-        Chưa có nhận xét nào cho tác phẩm này. Hãy là người đầu tiên đặt bút viết review!
+        Chưa có nhận xét cộng đồng nào cho tác phẩm này. Hãy là người đầu tiên đặt bút viết review!
       </div>
     <% } %>
   </div>
 
-  <!-- WRITE REVIEW FORM -->
+  <!-- WRITE / EDIT REVIEW FORM (HỖ TRỢ CẢ VIẾT MỚI LẪN CẬP NHẬT REVIEW) -->
   <div id="writeReview" class="vintage-card" style="border-left: 6px solid #4a2810;">
     <h3 style="font-family: 'Cinzel', serif; font-size: 20px; color: #2e1706; margin-bottom: 14px;">
-      ✍️ Đặt Bút Viết Cảm Nhận Của Bạn
+      <%= (typeof myReview !== 'undefined' && myReview) ? '✏️ Cập Nhật Cảm Nhận Của Bạn' : '✍️ Đặt Bút Viết Cảm Nhận Của Bạn' %>
     </h3>
     <form action="/reviews/create" method="POST">
       <input type="hidden" name="media_id" value="<%= item.id %>">
+      <input type="hidden" name="media_type" value="<%= item.media_type %>">
       
       <div style="margin-bottom: 16px;">
         <label style="display: block; font-weight: 700; margin-bottom: 6px; font-size: 14px;">Chấm Điểm Đánh Giá (Rating):</label>
-        <select name="rating" class="input-skeuo" style="max-width: 200px;">
-          <option value="5.0">★★★★★ 5.0 (Tuyệt Tác)</option>
-          <option value="4.5">★★★★½ 4.5 (Rất Xuất Sắc)</option>
-          <option value="4.0">★★★★☆ 4.0 (Rất Hay)</option>
-          <option value="3.5">★★★½☆ 3.5 (Khá Tốt)</option>
-          <option value="3.0">★★★☆☆ 3.0 (Bình Thường)</option>
-          <option value="2.0">★★☆☆☆ 2.0 (Dưới Kỳ Vọng)</option>
+        <select name="rating" class="input-skeuo" style="max-width: 220px; cursor: pointer;">
+          <option value="5.0" <%= (typeof myReview !== 'undefined' && myReview && myReview.rating == 5.0) ? 'selected' : '' %>>★★★★★ 5.0 (Tuyệt Tác)</option>
+          <option value="4.5" <%= (typeof myReview !== 'undefined' && myReview && myReview.rating == 4.5) ? 'selected' : '' %>>★★★★½ 4.5 (Rất Xuất Sắc)</option>
+          <option value="4.0" <%= (typeof myReview !== 'undefined' && myReview && myReview.rating == 4.0) ? 'selected' : '' %>>★★★★☆ 4.0 (Rất Hay)</option>
+          <option value="3.5" <%= (typeof myReview !== 'undefined' && myReview && myReview.rating == 3.5) ? 'selected' : '' %>>★★★½☆ 3.5 (Khá Tốt)</option>
+          <option value="3.0" <%= (typeof myReview !== 'undefined' && myReview && myReview.rating == 3.0) ? 'selected' : '' %>>★★★☆☆ 3.0 (Bình Thường)</option>
+          <option value="2.0" <%= (typeof myReview !== 'undefined' && myReview && myReview.rating == 2.0) ? 'selected' : '' %>>★★☆☆☆ 2.0 (Dưới Kỳ Vọng)</option>
         </select>
       </div>
 
       <div style="margin-bottom: 16px;">
         <label style="display: block; font-weight: 700; margin-bottom: 6px; font-size: 14px;">Nội Dung Nhận Xét:</label>
-        <textarea name="content" class="input-skeuo" rows="4" placeholder="Chia sẻ những góc nhìn, xúc cảm hoặc trích dẫn tâm đắc của bạn..." required></textarea>
+        <textarea name="content" class="input-skeuo" rows="4" placeholder="Chia sẻ những góc nhìn, xúc cảm hoặc trích dẫn tâm đắc của bạn..." required><%= (typeof myReview !== 'undefined' && myReview) ? myReview.content : '' %></textarea>
       </div>
 
       <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
-        <input type="checkbox" name="contains_spoilers" id="spoilerCheck" value="true">
+        <input type="checkbox" name="contains_spoilers" id="spoilerCheck" value="true" <%= (typeof myReview !== 'undefined' && myReview && myReview.contains_spoilers) ? 'checked' : '' %>>
         <label for="spoilerCheck" style="font-size: 14px; color: #624328; cursor: pointer;">
           Bài viết có chứa nội dung tiết lộ cốt truyện (Spoiler Alert)
         </label>
       </div>
 
       <button type="submit" class="btn-skeuo btn-brass" style="padding: 10px 24px; font-size: 14px;">
-        ✦ Đóng Dấu & Đăng Review Lên Hệ Thống
+        <%= (typeof myReview !== 'undefined' && myReview) ? '✦ Cập Nhật Lại Đánh Giá' : '✦ Đóng Dấu & Đăng Review Lên Hệ Thống' %>
       </button>
     </form>
   </div>
