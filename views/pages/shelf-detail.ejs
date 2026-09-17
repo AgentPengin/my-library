@@ -20,12 +20,12 @@
           </span>
           <% if (typeof isOwner !== 'undefined' && !isOwner) { %>
             <span style="font-size: 13px; color: #6f4728; font-style: italic;">
-              Tuyển chọn bởi: <strong style="color: #3b1e0a;"><%= shelf.owner ? shelf.owner.username : 'Độc giả thư viện' %></strong>
+              Tuyển chọn bởi: <strong style="color: #3b1e0a;"><%= shelf.owner ? shelf.owner.username : 'Người dùng' %></strong>
             </span>
           <% } %>
         </div>
 
-        <h1 style="font-family: 'Cinzel', serif; font-size: 26px; color: #2e1706; margin-bottom: 8px;">
+        <h1 style="font-family: 'Playfair Display', Georgia, serif; font-size: 26px; color: #2e1706; margin-bottom: 8px;">
           <%= shelf.name %>
         </h1>
         <p style="font-size: 16px; color: #523824; font-style: italic; max-width: 750px; line-height: 1.6;">
@@ -51,17 +51,17 @@
         <% if (typeof isOwner !== 'undefined' && isOwner) { %>
           <!-- NÚT MỞ MODAL THÊM SÁCH/PHIM TRỰC TIẾP -->
           <button type="button" class="btn-skeuo btn-brass" onclick="openAddMediaModal()">
-            ✦ Thêm Sách / Phim Vào Kệ
+            Thêm Sách / Phim Vào Kệ
           </button>
 
           <!-- NÚT XÓA TOÀN BỘ GIÁ SÁCH NÀY -->
           <form action="/shelves/<%= shelf.id %>/delete" method="POST" style="margin: 0; display: inline;" onsubmit="return confirm('⚠️ BẠN CÓ CHẮC CHẮN MUỐN XÓA GIÁ SÁCH NÀY?\n\nToàn bộ giá sách [<%= shelf.name %>] và các liên kết tác phẩm trên kệ sẽ bị dỡ bỏ. Hành động này không thể hoàn tác!');">
             <button type="submit" class="btn-skeuo btn-ruby">
-              🗑️ Xóa Giá Sách Này
+              Xóa Giá Sách Này
             </button>
           </form>
         <% } else { %>
-          <!-- NÚT THẢ TIM CHO KHÁCH XEM KỆ -->
+          <!-- Nút yêu thích giá sách -->
           <form action="/shelves/<%= shelf.id %>/like" method="POST" style="margin: 0; display: inline;">
             <button type="submit" class="btn-skeuo <%= shelf.is_liked_by_me ? 'btn-ruby' : 'btn-brass' %>" style="font-size: 13px; padding: 8px 16px;">
               <%= shelf.is_liked_by_me ? '❤️ Đã Thích Kệ' : '🤍 Yêu Thích Kệ Này' %> (<%= shelf.likes_count || 0 %>)
@@ -83,7 +83,7 @@
         🪵 Chế Độ Kệ Gỗ 3D
       </button>
       <button class="segmented-tab" onclick="switchShelfView('table', this)">
-        📋 Phiếu Thư Mục (Bảng)
+        📋 Chế độ danh sách
       </button>
     </div>
   </div>
@@ -94,7 +94,7 @@
       items: shelf.items, 
       currentShelfId: shelf.id, 
       currentShelfOwnerId: shelf.user_id,
-      isOwner: (typeof isOwner !== 'undefined' ? isOwner : true)
+      isOwner: (typeof isOwner !== 'undefined' ? Boolean(isOwner) : false)
     }) %>
   </div>
 
@@ -102,7 +102,7 @@
   <div id="viewTable" class="vintage-card" style="display: none; padding: 15px; overflow-x: auto;">
     <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 15px;">
       <thead>
-        <tr style="border-bottom: 2px solid #8e6843; color: #3b220d; font-family: 'Cinzel', serif;">
+        <tr style="border-bottom: 2px solid #8e6843; color: #3b220d; font-family: 'Playfair Display', Georgia, serif;">
           <th style="padding: 10px 8px;">Bìa</th>
           <th style="padding: 10px 8px;">Tên Tác Phẩm</th>
           <th style="padding: 10px 8px;">Tác Giả / Đạo Diễn</th>
@@ -163,27 +163,17 @@
 
 </main>
 
-<!-- MODAL: THÊM TÁC PHẨM VÀO KỆ HIỆN TẠI (CHỈ MỞ KHI CHỦ KỆ THAO TÁC) -->
 <% if (typeof isOwner === 'undefined' || isOwner) { %>
   <div class="modal-overlay" id="addMediaToShelfModal">
     <div class="modal-box" style="max-width: 620px; max-height: 88vh; overflow-y: auto;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
         <div>
-          <div class="library-stamp" style="font-size: 9px; padding: 2px 6px; margin-bottom: 6px;">MỤC LỤC THƯ VIỆN</div>
-          <h3 style="font-family: 'Cinzel', serif; font-size: 19px; color: #2c1608;">✦ Xếp Tác Phẩm Vào Kệ: <%= shelf.name %> ✦</h3>
+          <h3 style="font-family: 'Playfair Display', Georgia, serif; font-size: 19px; color: #2c1608;">THÊM SÁCH/PHIM VÀO KỆ: <%= shelf.name %></h3>
         </div>
-        <button type="button" class="btn-skeuo" onclick="closeAddMediaModal()" style="padding: 4px 10px; font-size: 12px;">✕ Đóng</button>
+        <button type="button" class="btn-skeuo" onclick="closeAddMediaModal()" style="padding: 4px 10px; font-size: 12px;">Đóng</button>
       </div>
 
       <!-- TAB SWITCHER -->
-      <div class="segmented-control" style="margin-bottom: 16px;">
-        <button type="button" class="segmented-tab active" id="tabSearchBtn" onclick="switchAddTab('search')">
-          🔍 Tìm Kiếm Sách / Phim
-        </button>
-        <button type="button" class="segmented-tab" id="tabDirectBtn" onclick="switchAddTab('direct')">
-          🏷️ Nhập Mã ID Trực Tiếp
-        </button>
-      </div>
 
       <!-- TAB 1: TÌM KIẾM TRỰC TIẾP -->
       <div id="tabSearchSection">
@@ -197,8 +187,8 @@
             required
           >
           <select id="shelfSearchType" class="input-skeuo" style="width: 140px; padding: 8px; cursor: pointer;">
-            <option value="BOOK">📚 Sách (Google)</option>
-            <option value="MOVIE">🎬 Phim (DB)</option>
+            <option value="BOOK">Sách</option>
+            <option value="MOVIE">Phim</option>
           </select>
           <button type="submit" class="btn-skeuo btn-brass" style="padding: 8px 16px; font-size: 13px;">
             ✦ Tìm
@@ -212,37 +202,7 @@
         </div>
       </div>
 
-      <!-- TAB 2: NHẬP MÃ ID TRỰC TIẾP -->
-      <div id="tabDirectSection" style="display: none;">
-        <form action="/shelves/add-item" method="POST">
-          <input type="hidden" name="shelf_id" value="<%= shelf.id %>">
-          <div style="margin-bottom: 14px;">
-            <label style="display: block; font-size: 13px; font-weight: 700; color: #3b220d; margin-bottom: 6px;">
-              Mã Lưu Trữ / Database ID / Google Books Volume ID:
-            </label>
-            <input 
-              type="text" 
-              name="media_id" 
-              class="input-skeuo" 
-              placeholder="Ví dụ: IFG7EQAAQBAJ (Google Books) hoặc mã phim..." 
-              required
-            >
-          </div>
-          <div style="margin-bottom: 18px;">
-            <label style="display: block; font-size: 13px; font-weight: 700; color: #3b220d; margin-bottom: 6px;">
-              Phân Loại:
-            </label>
-            <select name="media_type" class="input-skeuo" style="cursor: pointer;">
-              <option value="BOOK">📚 Sách (Google Books / CSDL)</option>
-              <option value="MOVIE">🎬 Phim (TMDB / CSDL)</option>
-            </select>
-          </div>
-          <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button type="button" class="btn-skeuo" onclick="closeAddMediaModal()">Hủy Bỏ</button>
-            <button type="submit" class="btn-skeuo btn-brass">✦ Xếp Vào Kệ Ngay</button>
-          </div>
-        </form>
-      </div>
+    
 
     </div>
   </div>
@@ -267,7 +227,7 @@
   function copyShelfLink() {
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
-      alert('📜 Đã sao chép liên kết giá sách công khai vào bộ nhớ tạm!\nBạn có thể gửi liên kết này cho bạn bè cùng chiêm ngưỡng.');
+      alert('Đã sao chép liên kết giá sách công khai vào bộ nhớ tạm!\nBạn có thể gửi liên kết này cho bạn bè cùng chiêm ngưỡng.');
     }).catch(() => {
       prompt('Sao chép liên kết bên dưới để chia sẻ giá sách:', url);
     });
@@ -310,7 +270,7 @@
 
     if (!query) return;
 
-    container.innerHTML = '<div style="text-align: center; color: #876d54; padding: 25px; font-style: italic;">⏳ Đang tra cứu mục lục thư viện...</div>';
+    container.innerHTML = '<div style="text-align: center; color: #876d54; padding: 25px; font-style: italic;">Đang tra cứu dữ liệu...</div>';
 
     try {
       const res = await fetch('/api/search-media?q=' + encodeURIComponent(query) + '&type=' + encodeURIComponent(type));
@@ -348,7 +308,7 @@
 
     } catch (err) {
       console.error(err);
-      container.innerHTML = '<div style="text-align: center; color: #a12b2b; padding: 15px;">Có lỗi xảy ra khi tra cứu. Vui lòng thử lại hoặc dùng Tab nhập ID trực tiếp.</div>';
+      container.innerHTML = '<div style="text-align: center; color: #a12b2b; padding: 15px;">Có lỗi xảy ra khi tra cứu. Vui lòng thử lại.</div>';
     }
   }
 

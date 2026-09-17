@@ -20,7 +20,7 @@
             item: item, 
             currentShelfId: typeof currentShelfId !== 'undefined' ? currentShelfId : null,
             currentShelfOwnerId: typeof currentShelfOwnerId !== 'undefined' ? currentShelfOwnerId : null,
-            isOwner: typeof isOwner !== 'undefined' ? isOwner : true
+            isOwner: (typeof isOwner !== 'undefined' ? Boolean(isOwner) : false)
           }) %>
         <% }) %>
       </div>

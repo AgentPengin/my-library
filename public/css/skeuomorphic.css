@@ -2,7 +2,7 @@
    ALEXANDRIA ARCHIVE - CLASSIC SKEUOMORPHIC STYLESHEET (iOS 4 / iBooks STYLE)
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&display=swap');
 
 /* --- Reset & Base Variables --- */
 :root {
@@ -33,6 +33,10 @@ body {
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', Georgia, serif;
 }
 
 a {
@@ -75,7 +79,7 @@ header.leather-bar::after {
 }
 
 .brand-title {
-  font-family: 'Cinzel', serif;
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 22px;
   font-weight: 900;
   letter-spacing: 1.5px;
@@ -111,7 +115,7 @@ header.leather-bar::after {
 
 .segmented-tab {
   padding: 6px 16px;
-  font-family: 'Cinzel', serif;
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 13px;
   font-weight: 700;
   color: #ad8d6f;
@@ -138,7 +142,7 @@ header.leather-bar::after {
 
 /* Glossy Skeuomorphic Buttons */
 .btn-skeuo {
-  font-family: 'Cinzel', serif;
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 13px;
   font-weight: 700;
   color: #f5eedb;
@@ -225,7 +229,7 @@ header.leather-bar::after {
 .brass-plate::after { right: 8px; }
 
 .brass-plate h2, .brass-plate h1 {
-  font-family: 'Cinzel', serif;
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 18px;
   color: #2b1704;
   text-transform: uppercase;
@@ -419,7 +423,7 @@ header.leather-bar::after {
   border: 1px solid #7c5836;
   color: #e5cd9e;
   font-size: 10px;
-  font-family: 'Cinzel', serif;
+  font-family: 'Playfair Display', Georgia, serif;
   font-weight: 700;
   padding: 1px 6px;
   border-radius: 2px;
@@ -496,7 +500,7 @@ header.leather-bar::after {
 .library-stamp {
   border: 2px dashed #932424;
   color: #932424;
-  font-family: 'Cinzel', serif;
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 11px;
   font-weight: 700;
   padding: 4px 10px;

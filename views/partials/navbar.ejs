@@ -1,20 +1,20 @@
 <header class="leather-bar">
   <div class="header-container">
     <a href="/" class="brand-title">
-      📜 ALEXANDRIA ARCHIVE
+      Kho lữu trữ sách/phim
       <span class="badge">Sách & Phim</span>
     </a>
 
     <!-- Center Navigation -->
     <div class="segmented-control">
       <a href="/" class="segmented-tab <%= currentRoute === 'home' ? 'active' : '' %>">
-        🏛️ Sảnh Chính
+        Sảnh Chính
       </a>
       <a href="/shelves" class="segmented-tab <%= currentRoute === 'shelves' ? 'active' : '' %>">
-        📚 Giá Sách Của Tôi
+        Giá Sách Của Tôi
       </a>
       <a href="/search" class="segmented-tab <%= currentRoute === 'search' ? 'active' : '' %>">
-        🔍 Tra Cứu API
+        Tìm sách/phim
       </a>
     </div>
 
@@ -27,15 +27,15 @@
           <span><%= currentUser.username %></span>
         </a>
         <a href="/auth/logout" class="btn-skeuo btn-ruby" title="Đăng xuất" style="padding: 7px 11px; font-size: 12px;">
-          🚪 Thoát
+          Đăng xuất
         </a>
       <% } else { %>
         <!-- Guest State: Show Both Login & Register Buttons -->
         <a href="/login" class="btn-skeuo" style="font-size: 12px; padding: 7px 12px;">
-          🔑 Đăng Nhập
+          Đăng Nhập
         </a>
         <a href="/register" class="btn-skeuo btn-brass" style="font-size: 12px; padding: 7px 14px;">
-          ✦ Đăng Ký Thẻ Mới
+          Đăng Ký
         </a>
       <% } %>
     </div>

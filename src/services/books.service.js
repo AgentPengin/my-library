@@ -214,10 +214,43 @@ async function getBook(bookId) {
   }
 }
 
+async function searchBooksGoogle(query) {
+  try {
+
+    const googleApiKey = process.env.GOOGLE_BOOKS_API;
+    const url = `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(query)}&maxResults=10&orderBy=relevance&langRestrict=vi&key=${googleApiKey}`;
+    const response = await fetch(url);
+    if (!response.ok) return [];
+    const data = await response.json();
+    if (!data.items) return [];
+
+    return data.items.map((item) => {
+      const vol = item.volumeInfo || {};
+      return {
+        id: item.id,
+        media_type: 'BOOK',
+        title: vol.title || 'Không rõ tiêu đề',
+        creator: Array.isArray(vol.authors)
+          ? vol.authors.join(', ')
+          : vol.authors || 'Không rõ tác giả',
+        release_year: vol.publishedDate ? vol.publishedDate.slice(0, 4) : '—',
+        poster_url:
+          vol.imageLinks?.thumbnail ||
+          vol.imageLinks?.smallThumbnail ||
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4Ykql_OXy7qrC4I1_luoiAAPBYozVJFJvp6xJbUB3pbIxqwrbnUm82g&s=10',
+      };
+    });
+  } catch (err) {
+    console.error('Lỗi khi tìm kiếm sách qua Google Books:', err.message);
+    return [];
+  }
+}
+
 module.exports = {
   parseGenres,
   getOpenLibraryRating,
   updateBooksListsWeek,
   getBooksListsOfWeek,
   getBook,
+  searchBooksGoogle,
 };

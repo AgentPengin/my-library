@@ -7,7 +7,7 @@
   <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
     <% if (typeof fromShelf !== 'undefined' && fromShelf) { %>
       <a href="/shelves/<%= fromShelf %>" class="btn-skeuo" style="font-size: 12px; padding: 5px 12px;">
-        ◀ Quay Lại Giá Sách Tuyển Chọn
+        ◀ Quay Lại Giá Sách/Phim
       </a>
     <% } else { %>
       <a href="javascript:history.back()" class="btn-skeuo" style="font-size: 12px; padding: 5px 12px;">
@@ -19,13 +19,13 @@
   <!-- CURATOR'S SPOTLIGHT (NẾU ĐI TỪ LINK CHIA SẺ CỦA NGƯỜI TUYỂN CHỌN) -->
   <% if (typeof curatorReview !== 'undefined' && curatorReview) { %>
     <div class="vintage-card" style="margin-bottom: 30px; border: 2px solid #b8860b; background: linear-gradient(to bottom, #fffdf8 0%, #fbf5e8 100%); box-shadow: 0 6px 20px rgba(184, 134, 11, 0.2);">
-      <div class="library-stamp" style="float: right; background: #8e2b10; color: #fff;">LỜI BÌNH NGƯỜI TUYỂN CHỌN</div>
+      <div class="library-stamp" style="float: right; background: #8e2b10; color: #fff;">LỜI BÌNH CỦA NGƯỜI DÙNG</div>
       
       <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 12px;">
         <img src="<%= curatorReview.avatar_url %>" alt="" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #b8860b; object-fit: cover;">
         <div>
-          <div style="font-size: 11px; color: #8a6538; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Góc nhìn tuyển chọn từ độc giả:</div>
-          <div style="font-family: 'Cinzel', serif; font-size: 18px; color: #2e1706; font-weight: 700;"><%= curatorReview.username %></div>
+          <div style="font-size: 11px; color: #8a6538; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Góc nhìn từ người dùng:</div>
+          <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 18px; color: #2e1706; font-weight: 700;"><%= curatorReview.username %></div>
         </div>
       </div>
 
@@ -87,7 +87,7 @@
         <div class="star-rating">
           ★ ★ ★ ★ ★ 
           <span style="color: #4b321a; font-size: 15px; font-weight: 700;">
-            <%= item.average_rating || '4.8' %> / 5.0
+            <%= item.average_rating || '4.8' %> / 10.0
           </span>
           <span style="font-size: 13px; color: #80674e; font-weight: 400;">
             (<%= item.total_reviews || 0 %> đánh giá từ cộng đồng)
@@ -96,7 +96,7 @@
 
         <!-- Synopsis -->
         <div style="background: rgba(255,255,255,0.4); border-left: 3px solid #9e6435; padding: 14px 18px; margin-bottom: 24px; border-radius: 0 4px 4px 0;">
-          <h4 style="font-family: 'Cinzel', serif; font-size: 13px; text-transform: uppercase; color: #5a381c; margin-bottom: 6px;">
+          <h4 style="font-family: 'Playfair Display', Georgia, serif; font-size: 13px; text-transform: uppercase; color: #5a381c; margin-bottom: 6px;">
             Tóm Tắt Tác Phẩm
           </h4>
           <p style="font-size: 16px; line-height: 1.7; color: #3b2513;">
@@ -111,7 +111,7 @@
             data-media-id="<%= item.id %>"
             data-media-title="<%= item.title %>"
             style="padding: 10px 22px; font-size: 14px;">
-            ✦ Thêm Vào Giá Sách Của Bạn
+            Thêm Vào Giá Sách Của Bạn
           </button>
 
           <a href="#writeReview" class="btn-skeuo" style="padding: 10px 20px; font-size: 14px;">
@@ -125,8 +125,6 @@
 
     <!-- Footnote details -->
     <div style="margin-top: 24px; border-top: 1px dashed #cfbfa0; padding-top: 10px; font-size: 12px; color: #785f46; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-      <span>Mã số lưu trữ (Database ID): <code><%= item.id %></code></span>
-      <span>Định dạng API: <strong><%= item.media_type === 'BOOK' ? 'Google Books v1' : 'TMDB REST v3' %></strong></span>
     </div>
 
   </div>
@@ -138,17 +136,27 @@
       
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
         <div>
-          <h3 style="font-family: 'Cinzel', serif; font-size: 18px; color: #1a3310; margin-bottom: 4px;">
-            📜 Cảm Nhận & Điểm Số Cá Nhân Của Bạn
+          <h3 style="font-family: 'Playfair Display', Georgia, serif; font-size: 18px; color: #1a3310; margin-bottom: 4px;">
+            Cảm Nhận & Điểm Số Cá Nhân Của Bạn
           </h3>
           <div style="font-size: 12px; color: #557049;">
             Ghi nhận vào sổ thư viện: <strong><%= myReview.created_at ? new Date(myReview.created_at).toLocaleDateString('vi-VN') : 'Đã ghi' %></strong>
           </div>
         </div>
 
-        <a href="#writeReview" class="btn-skeuo btn-brass" style="font-size: 12px; padding: 5px 12px;">
-          ✏️ Chỉnh Sửa Bài Viết
-        </a>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <a href="#writeReview" class="btn-skeuo btn-brass" style="font-size: 12px; padding: 5px 12px;">
+            Chỉnh Sửa Bài Viết
+          </a>
+
+          <form action="/reviews/<%= myReview.id %>/delete" method="POST" style="margin: 0; display: inline;" onsubmit="return confirm('⚠️ BẠN CÓ CHẮC CHẮN MUỐN XÓA BÀI VIẾT NÀY?\n\nToàn bộ nội dung cảm nhận và số sao bạn đã chấm sẽ bị gỡ bỏ khỏi hồ sơ tác phẩm. Hành động này không thể hoàn tác!');">
+            <input type="hidden" name="media_id" value="<%= item.id %>">
+            <input type="hidden" name="media_type" value="<%= item.media_type %>">
+            <button type="submit" class="btn-skeuo btn-ruby" style="font-size: 12px; padding: 5px 12px;">
+              Xóa Bài Viết
+            </button>
+          </form>
+        </div>
       </div>
 
       <div class="star-rating" style="font-size: 16px; margin-bottom: 8px;">
@@ -169,7 +177,7 @@
   <!-- REVIEWS SECTION: ĐÁNH GIÁ TỪ CỘNG ĐỒNG -->
   <div class="section-head-bar">
     <div class="brass-plate">
-      <h2>✦ Đánh Giá Từ Độc Giả Cộng Đồng (<%= (item.reviews && item.reviews.length) ? item.reviews.length : 0 %>) ✦</h2>
+      <h2>Đánh Giá Từ Người dùng khác (<%= (item.reviews && item.reviews.length) ? item.reviews.length : 0 %>) ✦</h2>
     </div>
   </div>
 
@@ -178,7 +186,18 @@
     <% if (item.reviews && item.reviews.length > 0) { %>
       <% item.reviews.forEach(review => { %>
         <div class="vintage-card" style="padding: 20px;">
-          <div class="library-stamp" style="float: right;">XÁC THỰC (VERIFIED)</div>
+          <div style="float: right; display: flex; gap: 8px; align-items: center;">
+            <span class="library-stamp">XÁC THỰC (VERIFIED)</span>
+            <% if (typeof currentUser !== 'undefined' && currentUser && review.user_id === currentUser.id) { %>
+              <form action="/reviews/<%= review.id %>/delete" method="POST" style="margin: 0; display: inline;" onsubmit="return confirm('Bạn có chắc muốn xóa bài review này?');">
+                <input type="hidden" name="media_id" value="<%= item.id %>">
+                <input type="hidden" name="media_type" value="<%= item.media_type %>">
+                <button type="submit" class="btn-skeuo btn-ruby" style="font-size: 10px; padding: 2px 7px;">
+                  🗑️ Xóa
+                </button>
+              </form>
+            <% } %>
+          </div>
           
           <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 10px;">
             <img src="<%= review.avatar_url || 'https://i.pinimg.com/736x/6c/0a/05/6c0a05a88d4dc79a696fc9a3c6aaba30.jpg' %>" alt="" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid #7c5836; object-fit: cover;">
@@ -211,8 +230,8 @@
 
   <!-- WRITE / EDIT REVIEW FORM (HỖ TRỢ CẢ VIẾT MỚI LẪN CẬP NHẬT REVIEW) -->
   <div id="writeReview" class="vintage-card" style="border-left: 6px solid #4a2810;">
-    <h3 style="font-family: 'Cinzel', serif; font-size: 20px; color: #2e1706; margin-bottom: 14px;">
-      <%= (typeof myReview !== 'undefined' && myReview) ? '✏️ Cập Nhật Cảm Nhận Của Bạn' : '✍️ Đặt Bút Viết Cảm Nhận Của Bạn' %>
+    <h3 style="font-family: 'Playfair Display', Georgia, serif; font-size: 20px; color: #2e1706; margin-bottom: 14px;">
+      <%= (typeof myReview !== 'undefined' && myReview) ? 'Cập Nhật Cảm Nhận Của Bạn' : 'Viết Cảm Nhận Của Bạn' %>
     </h3>
     <form action="/reviews/create" method="POST">
       <input type="hidden" name="media_id" value="<%= item.id %>">
@@ -243,7 +262,7 @@
       </div>
 
       <button type="submit" class="btn-skeuo btn-brass" style="padding: 10px 24px; font-size: 14px;">
-        <%= (typeof myReview !== 'undefined' && myReview) ? '✦ Cập Nhật Lại Đánh Giá' : '✦ Đóng Dấu & Đăng Review Lên Hệ Thống' %>
+        <%= (typeof myReview !== 'undefined' && myReview) ? 'Cập Nhật Lại Đánh Giá' : 'Đăng Review Lên Hệ Thống' %>
       </button>
     </form>
   </div>

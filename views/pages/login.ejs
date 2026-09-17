@@ -6,17 +6,16 @@
   <div class="vintage-card" style="border: 4px solid #5a381e; box-shadow: 0 20px 45px rgba(0,0,0,0.9);">
     
     <div style="text-align: center; margin-bottom: 24px;">
-      <div class="library-stamp" style="font-size: 11px; margin-bottom: 8px;">HỆ THỐNG XÁC THỰC ĐỘC GIẢ</div>
-      <h1 style="font-family: 'Cinzel', serif; font-size: 24px; color: #2e1706; letter-spacing: 1px;">
-        Đăng Nhập Thư Viện
+      <div class="library-stamp" style="font-size: 11px; margin-bottom: 8px;">XÁC NHẬN NGƯỜI DÙNG</div>
+      <h1 style="font-family: 'Playfair Display', Georgia, serif; font-size: 24px; color: #2e1706; letter-spacing: 1px;">
+        Đăng Nhập
       </h1>
       <p style="font-size: 14px; color: #6b4d32; font-style: italic; margin-top: 4px;">
-        Mở cuốn sổ tay cá nhân và truy cập vào các giá sách của bạn
+        Nhập tài khoản và mật khẩu của bạn để mở cửa kho lưu trữ sách và phim cá nhân.
       </p>
     </div>
 
     <% if (typeof error !== 'undefined' && error) { %>
-      <!-- iOS 4 Passcode Error Style: Rung lắc nhẹ kèm tem mộc từ chối vintage -->
       <div class="skeuo-error-alert">
         <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px;">
           <span class="library-stamp" style="font-size: 10px; padding: 2px 8px; transform: rotate(-2deg); background: rgba(147, 36, 36, 0.08);">
@@ -35,7 +34,7 @@
     <form action="/auth/login" method="POST">
       <div style="margin-bottom: 18px;">
         <label style="display: block; font-size: 14px; font-weight: 700; color: #3b220d; margin-bottom: 6px;">
-          Email Hoặc Tên Độc Giả:
+          Email Hoặc Tên Người dùng:
         </label>
         <input 
           type="text" 
@@ -69,14 +68,14 @@
       </div>
 
       <button type="submit" class="btn-skeuo btn-brass" style="width: 100%; justify-content: center; padding: 12px; font-size: 15px;">
-        ✦ Mở Cửa Thư Viện (Đăng Nhập)
+        Đăng nhập
       </button>
     </form>
 
     <div style="margin-top: 24px; border-top: 1px dashed #d1c09e; padding-top: 16px; text-align: center; font-size: 14px; color: #6b4d32;">
-      Chưa có thẻ độc giả? 
+      Chưa đăng ký? 
       <a href="/register" style="font-weight: 700; color: #2e1706; text-decoration: underline;">
-        Đăng ký cấp thẻ mới ngay
+        Đăng ký ngay
       </a>
     </div>
 

@@ -1,5 +1,4 @@
 <% 
-  // Tạo URL cho tác phẩm kèm tham số curator nếu được truyền vào
   let itemUrl = `/${item.media_type === 'BOOK' ? 'books' : 'movies'}/${item.id}`;
   if (typeof currentShelfOwnerId !== 'undefined' && currentShelfOwnerId) {
     itemUrl += `?curator=${currentShelfOwnerId}`;
@@ -57,8 +56,8 @@
       </div>
     <% } %>
     
-    <!-- Action Button (Gỡ Khỏi Kệ cho chủ sở hữu, hoặc Thêm Vào Kệ) -->
-    <% if (typeof currentShelfId !== 'undefined' && currentShelfId && (typeof isOwner === 'undefined' || isOwner)) { %>
+    <!-- Action Button (Gỡ Khỏi Kệ cho chủ sở hữu, hoặc Thêm Vào Kệ cho khách) -->
+    <% if (typeof currentShelfId !== 'undefined' && currentShelfId && typeof isOwner !== 'undefined' && isOwner === true) { %>
       <!-- Nút gỡ khỏi kệ hiện tại trên kệ gỗ 3D (Chỉ chủ kệ mới thấy) -->
       <div style="margin-top: 6px;">
         <form action="/shelves/<%= currentShelfId %>/remove-item" method="POST" style="margin: 0;" onsubmit="return confirm('Bạn có chắc muốn gỡ tác phẩm [<%= item.title %>] khỏi giá sách?');">
@@ -69,7 +68,7 @@
         </form>
       </div>
     <% } else { %>
-      <!-- Quick Add to shelf button (khi ở trang chủ, tìm kiếm hoặc khách xem) -->
+      <!-- Quick Add to shelf action -->
       <div style="margin-top: 6px;">
         <button 
           class="btn-skeuo btn-brass js-open-shelf-modal" 

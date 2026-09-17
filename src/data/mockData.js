@@ -1,8 +1,6 @@
 /**
- * MOCK DATA - CHUẨN HÓA 100% THEO FILE 'DataQuery/CREATE DATABASE.sql'
- * 
- * Khi code Backend với PostgreSQL, bạn chỉ cần thay thế các hàm ở cuối file
- * bằng các câu truy vấn db.query() tương ứng!
+ * Mock data fixtures conforming to schema definition.
+ * Used for development fixtures and seed data.
  */
 
 const currentUser = {

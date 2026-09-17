@@ -1,4 +1,4 @@
-<%- include('../partials/header', { title: 'Giá Sách Của Tôi - Alexandria Archive' }) %>
+<%- include('../partials/header', { title: 'Giá Sách Của Tôi' }) %>
 <%- include('../partials/navbar', { currentRoute: 'shelves' }) %>
 
 <main class="main-wall">
@@ -9,25 +9,24 @@
       <div style="display: flex; gap: 20px; align-items: center;">
         <img src="<%= currentUser.avatar_url %>" alt="avatar" style="width: 70px; height: 70px; border-radius: 6px; border: 2px solid #5a3a1f; box-shadow: 0 4px 10px rgba(0,0,0,0.4); object-fit: cover;">
         <div>
-          <div class="library-stamp" style="font-size: 10px; margin-bottom: 4px;">CHỦ NHÂN KHO SÁCH</div>
-          <h2 style="font-family: 'Cinzel', serif; font-size: 22px; color: #2e1706;"><%= currentUser.username %></h2>
+          <div class="library-stamp" style="font-size: 10px; margin-bottom: 4px;">CHỦ NHÂN KHO SÁCH/PIM</div>
+          <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 22px; color: #2e1706;"><%= currentUser.username %></h2>
           <p style="font-size: 14px; color: #644933; font-style: italic;"><%= currentUser.bio %></p>
           <div style="font-size: 12px; color: #876d54; margin-top: 4px;">
-            Số Thẻ Độc Giả: <strong><%= currentUser.library_card_no %></strong> • Gia nhập: <%= currentUser.member_since %>
           </div>
         </div>
       </div>
 
       <div>
         <button class="btn-skeuo btn-brass" onclick="document.getElementById('newShelfBox').style.display = document.getElementById('newShelfBox').style.display === 'none' ? 'block' : 'none'">
-          ✦ Đóng Kệ Sách Mới
+          Đóng Kệ Sách/Phim Mới
         </button>
       </div>
     </div>
   <% } else { %>
     <div class="vintage-card" style="margin-bottom: 35px; text-align: center; padding: 25px;">
       <div class="library-stamp" style="margin-bottom: 8px;">KHÁCH VÃNG LAI</div>
-      <h2 style="font-family: 'Cinzel', serif; font-size: 22px; color: #2e1706; margin-bottom: 8px;">
+      <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 22px; color: #2e1706; margin-bottom: 8px;">
         Chào Mừng Bạn Đến Với Thư Viện
       </h2>
       <p style="font-size: 15px; color: #5a3a1f; max-width: 650px; margin: 0 auto 16px;">
@@ -42,8 +41,8 @@
 
   <!-- COLLAPSIBLE FORM: CREATE NEW SHELF -->
   <div id="newShelfBox" class="vintage-card" style="display: none; margin-bottom: 35px; border-left: 6px solid #8a4b27;">
-    <h3 style="font-family: 'Cinzel', serif; font-size: 18px; color: #321908; margin-bottom: 12px;">
-      ✦ Chế Tác Kệ Sách Mới (Tạo Bảng Shelves trong PostgreSQL)
+    <h3 style="font-family: 'Playfair Display', Georgia, serif; font-size: 18px; color: #321908; margin-bottom: 12px;">
+      Tạo Kệ Sách/Phim Mới
     </h3>
     <form action="/shelves/create" method="POST">
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 16px;">
@@ -68,11 +67,11 @@
         </div>
       </div>
       <div style="margin-bottom: 16px;">
-        <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px;">Lời Đề Từ / Mô Tả Kệ:</label>
+        <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px;">Mô tả về kệ của bạn:</label>
         <textarea name="description" class="input-skeuo" rows="2" placeholder="Ghi chú vài dòng về lý do bạn gom các tác phẩm này lại với nhau..."></textarea>
       </div>
       <div style="text-align: right;">
-        <button type="submit" class="btn-skeuo btn-brass">✦ Đóng Kệ & Lưu Vào CSDL</button>
+        <button type="submit" class="btn-skeuo btn-brass">Đóng Kệ và Lưu</button>
       </div>
     </form>
   </div>
@@ -94,7 +93,7 @@
 
         <div style="display: flex; gap: 10px; align-items: center;">
           <span style="font-size: 12px; color: #c4ab8e;">
-            <%= shelf.is_public ? '🌍 Kệ Công Khai' : '🔒 Kệ Riêng Tư' %>
+            <%= shelf.is_public ? 'Kệ Công Khai' : 'Kệ Riêng Tư' %>
           </span>
           <a href="/shelves/<%= shelf.id %>" class="btn-skeuo">
             📖 Quản Lý Kệ Này

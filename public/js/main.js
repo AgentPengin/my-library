@@ -1,8 +1,3 @@
-/**
- * ALEXANDRIA ARCHIVE - CLIENT-SIDE SCRIPT
- * Xử lý tương tác UI, modal và filter client-side trước khi ghép backend hoàn chỉnh
- */
-
 document.addEventListener('DOMContentLoaded', () => {
   // Modal handlers
   const modalOverlay = document.getElementById('shelfModal');

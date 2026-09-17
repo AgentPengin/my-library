@@ -84,7 +84,7 @@ router.get('/shelves/:id', async (req, res) => {
     }
     const shelfRow = queryShelves.rows[0];
 
-    const isOwner = req.user && req.user.id === shelfRow.user_id;
+    const isOwner = Boolean(req.user && req.user.id === shelfRow.user_id);
 
     if (!shelfRow.is_public && !isOwner) {
       return res.status(403).send('Giá sách này đã được đặt ở chế độ riêng tư bởi chủ sở hữu.');
@@ -210,31 +210,16 @@ router.post('/shelves/:id/delete', isAuthenticated, async (req, res) => {
   }
 });
 
-/* ==========================================================================
-   TEMPLATE ROUTE DÀNH CHO EM LẬP TRÌNH:
-   ========================================================================== */
-
 /**
- * 7. [TEMPLATE] THÍCH / BỎ THÍCH GIÁ SÁCH (TOGGLE LIKE)
- * URL: POST /shelves/:id/like
- * 
- * 💡 Gợi ý logic cho em:
- * 1. Kiểm tra đăng nhập (nếu chưa đăng nhập thì redirect về /login).
- * 2. Lấy shelfId từ req.params.id và userId từ req.user.id.
- * 3. Kiểm tra xem người dùng đã like kệ này trong bảng "shelf_likes" chưa:
- *    SELECT 1 FROM shelf_likes WHERE shelf_id = $1 AND user_id = $2;
- * 4. Nếu ĐÃ LIKE: Xóa đi (Bỏ thích):
- *    DELETE FROM shelf_likes WHERE shelf_id = $1 AND user_id = $2;
- * 5. Nếu CHƯA LIKE: Thêm vào (Thích):
- *    INSERT INTO shelf_likes (shelf_id, user_id) VALUES ($1, $2);
- * 6. Redirect lại trang chi tiết kệ: res.redirect(`/shelves/${shelfId}`);
+ * @route   POST /shelves/:id/like
+ * @desc    Toggle like / unlike for a shelf
+ * @access  Private
  */
 router.post('/shelves/:id/like', isAuthenticated, async (req, res) => {
   const shelfId = req.params.id;
   const userId = req.user.id;
 
   try {
-    // TODO: Em tự tay viết logic truy vấn SQL toggle like tại đây nhé!
     const check = await db.query(
       'SELECT 1 FROM shelf_likes WHERE shelf_id = $1 AND user_id = $2',
       [shelfId, userId]

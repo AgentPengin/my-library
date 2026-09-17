@@ -140,8 +140,49 @@ async function getFilmsListsOfDay() {
   }
 }
 
+async function searchMovies(query) {
+  try {
+    const tmdb_api_key = process.env.TMDB_API_KEY;
+    const res = await fetch(
+      `https://api.themoviedb.org/3/search/movie?api_key=${tmdb_api_key}&query=${encodeURIComponent(
+        query
+      )}&language=vi-VN&page=1`
+    );
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+    const data = await res.json();
+    if (!data.results) return [];
+    
+    const results = await Promise.all(data.results.map(async(item) => {
+      const releaseYear = item.release_date ? item.release_date.slice(0, 4) : '—';
+      const creditRes = await fetch(
+        `https://api.themoviedb.org/3/movie/${item.id}/credits?api_key=${tmdb_api_key}&language=vi-VN`
+      );
+      const creditData = await creditRes.json();
+    
+      const director = creditData.crew?.find((member) => member.job === 'Director');
+      const name = director?.name || director?.original_name || 'Đạo diễn đang cập nhật';
+
+      return {
+        id: String(item.id),
+        media_type: 'MOVIE',
+        title: item.title || item.original_title || 'Không rõ tiêu đề',
+        creator: name || 'Đạo diễn đang cập nhật', // TMDB không cung cấp thông tin đạo diễn trong kết quả tìm kiếm
+        release_year: releaseYear,
+        poster_url: item.poster_path
+          ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+          : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4Ykql_OXy7qrC4I1_luoiAAPBYozVJFJvp6xJbUB3pbIxqwrbnUm82g&s=10',
+      };
+    }));
+    return results;
+  } catch (err) {
+    console.error('Lỗi khi tìm kiếm phim:', err.message);
+    return [];
+  }
+}
+
 module.exports = {
   getFilm,
   updateFilmsListsWeek,
   getFilmsListsOfDay,
+  searchMovies,
 };
